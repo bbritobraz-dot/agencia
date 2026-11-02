@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Plataforma RUNA — Site Institucional + Diagnóstico Digital Gamificado + CRM Interno
 
-## Getting Started
+Plataforma oficial da **RUNA** desenvolvida em **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, **Framer Motion** e **Supabase (PostgreSQL + Auth + RLS)**.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 1. Arquitetura da Plataforma
+
+### Camada Pública (`src/app/(public)`)
+- **`/` (Home)**: Hero premium, prévia interativa do diagnóstico, seção com as 6 categorias de serviços, benefícios, projetos e cases configuráveis, metodologia de trabalho e CTA final.
+- **`/solucoes` e `/solucoes/[slug]`**: Páginas individuais com metadados SEO próprios para cada serviço:
+  1. `/solucoes/gestao-de-trafego-pago`
+  2. `/solucoes/sites-e-landing-pages`
+  3. `/solucoes/ecommerce`
+  4. `/solucoes/automacoes-e-ia`
+  5. `/solucoes/sistemas-sob-medida`
+  6. `/solucoes/dados-e-analytics`
+- **`/diagnostico`**: Diagnóstico Digital Gamificado com 8 perguntas, cálculo de pontuação geral (0 a 100) e por categoria, identificação de gargalos, recomendação de serviços, exibição imediata do resultado e criação automática do lead no CRM interno.
+- **`/projetos`**: Vitrine técnica e estrutura configurável (`src/config/projects.ts`) pronta para inserção de evidências e cases autorizados.
+- **`/sobre`**: Posicionamento institucional da RUNA.
+- **`/contato`**: Formulário comercial integrado diretamente ao CRM interno.
+- **`/politica-de-privacidade`**: Diretrizes de proteção de dados e consentimento LGPD.
+
+### Camada Administrativa Privada — CRM Interno (`src/app/admin`)
+- **`/admin/login`**: Autenticação restrita via Supabase Auth + verificação de perfil ativo em `public.admin_profiles` (sem auto-registro público).
+- **`/admin`**: Dashboard com Total de leads, Novos leads, Leads qualificados, Oportunidades em negociação, Leads convertidos, Taxa de conversão por etapa, Origem dos leads e Serviços mais procurados.
+- **`/admin/leads`**: Lista de leads com pesquisa, filtros combinados, cadastro manual de leads e exportação CSV.
+- **`/admin/pipeline`**: Funil Kanban interativo com as 7 etapas (*Novo lead, Em contato, Qualificado, Proposta enviada, Negociação, Fechado, Perdido*) e registro automático de histórico.
+- **`/admin/leads/[id]`**: Ficha completa do lead com dados de contato, empresa, segmento, faixa de faturamento, UTMs, respostas das 8 perguntas do diagnóstico, pontuação, oportunidades, serviço recomendado, edição de status comercial, notas internas, registro de contatos, agendamento de follow-ups e botão direto para abrir conversa no WhatsApp.
+
+---
+
+## 2. Configuração do Banco de Dados no Supabase
+
+1. No painel do seu projeto Supabase, abra o **SQL Editor** e execute o arquivo de migration:
+   - `supabase/migrations/20261102000000_runa_platform_schema.sql`
+2. Para provisionar seu usuário administrador:
+   - Crie o usuário em **Authentication → Users → Add User** no painel do Supabase.
+   - Copie o `UUID` do usuário criado e insira na tabela `public.admin_profiles`:
+
+```sql
+INSERT INTO public.admin_profiles (id, email, full_name, role, active)
+VALUES (
+  'UUID-DO-SEU-USUARIO-AUTH',
+  'seu-email@runamkt.com.br',
+  'Administrador RUNA',
+  'super_admin',
+  true
+);
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 3. Variáveis de Ambiente (`.env.local`)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copie `.env.example` para `.env.local` e preencha com as chaves reais do seu projeto Supabase:
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-anon-key-aqui
+SUPABASE_SERVICE_ROLE_KEY=sua-service-role-key-aqui
+NEXT_PUBLIC_RUNA_WHATSAPP=554584317910
+NEXT_PUBLIC_SITE_URL=https://runamkt.com.br
+```
