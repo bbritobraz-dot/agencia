@@ -48,17 +48,35 @@ CREATE TRIGGER set_admin_profiles_updated_at
 -- Função auxiliar SECURITY DEFINER para verificação de admin ativo em RLS
 CREATE OR REPLACE FUNCTION public.is_active_admin()
 RETURNS BOOLEAN
-LANGUAGE sql
+LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
-STABLE
 AS $$
-    SELECT EXISTS (
+BEGIN
+    RETURN EXISTS (
         SELECT 1
         FROM public.admin_profiles
         WHERE id = auth.uid()
           AND active = true
     );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_super_admin()
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1
+        FROM public.admin_profiles
+        WHERE id = auth.uid()
+          AND active = true
+          AND role = 'super_admin'
+    );
+END;
 $$;
 
 -- -----------------------------------------------------------------------------
@@ -362,21 +380,21 @@ CREATE POLICY "Admins read own or all profiles"
     TO authenticated
     USING (id = auth.uid() OR public.is_active_admin());
 
-CREATE POLICY "Super admins manage profiles"
-    ON public.admin_profiles FOR ALL
+CREATE POLICY "Admins update own profile"
+    ON public.admin_profiles FOR UPDATE
     TO authenticated
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.admin_profiles ap
-            WHERE ap.id = auth.uid() AND ap.active = true AND ap.role = 'super_admin'
-        )
-    )
-    WITH CHECK (
-        EXISTS (
-            SELECT 1 FROM public.admin_profiles ap
-            WHERE ap.id = auth.uid() AND ap.active = true AND ap.role = 'super_admin'
-        )
-    );
+    USING (id = auth.uid() OR public.is_super_admin())
+    WITH CHECK (id = auth.uid() OR public.is_super_admin());
+
+CREATE POLICY "Super admins insert profiles"
+    ON public.admin_profiles FOR INSERT
+    TO authenticated
+    WITH CHECK (public.is_super_admin());
+
+CREATE POLICY "Super admins delete profiles"
+    ON public.admin_profiles FOR DELETE
+    TO authenticated
+    USING (public.is_super_admin());
 
 -- Policies: pipeline_stages (somente admins autenticados leem/gerenciam)
 CREATE POLICY "Active admins can read pipeline_stages"
