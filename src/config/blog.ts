@@ -49,6 +49,83 @@ export interface BlogPost {
 
 export const RUNA_BLOG_POSTS: BlogPost[] = [
   {
+    title: 'Meta Andromeda: como a IA seleciona anúncios e o que muda para sua empresa',
+    slug: 'meta-andromeda-ia-anuncios',
+    seoTitle: 'Meta Andromeda: o que muda nos anúncios da sua empresa',
+    metaDescription:
+      'Entenda o Meta Andromeda e como organizar criativos, dados e testes para melhorar as decisões de investimento em anúncios no Facebook e Instagram.',
+    excerpt:
+      'A Meta está aprimorando a seleção de anúncios com IA. Veja como transformar essa evolução em um processo melhor de criação, análise e investimento.',
+    author: 'Bruno',
+    authorRole: 'Fundador & Estrategista Digital na RUNA',
+    category: 'Meta Ads',
+    tags: ['Meta Andromeda', 'tráfego pago', 'inteligência artificial', 'criativos', 'Meta Ads'],
+    date: '2026-11-03',
+    updated: '2026-11-03',
+    readingTime: '5 min de leitura',
+    status: 'published',
+    cover: {
+      png: '/blog/meta-andromeda-ia-anuncios/capa-meta-andromeda.png',
+      webp: '/blog/meta-andromeda-ia-anuncios/capa-meta-andromeda.webp',
+      avif: '/blog/meta-andromeda-ia-anuncios/capa-meta-andromeda.avif',
+      width: 1672,
+      height: 941,
+      alt: 'Ilustração editorial de cartões publicitários com um anúncio em destaque, representando a seleção de anúncios pelo Meta Andromeda.',
+    },
+    toc: [
+      { id: 'o-que-e-o-meta-andromeda', title: 'O que é o Meta Andromeda?' },
+      { id: 'preciso-ativar-na-minha-campanha', title: 'Preciso ativar isso na minha campanha no Brasil?' },
+      { id: 'o-que-sua-empresa-pode-fazer', title: 'O que sua empresa pode fazer com essa informação?' },
+      { id: 'exemplo-motivos-de-compra', title: 'Um exemplo simples: três motivos para a mesma cafeteria' },
+      { id: 'como-organizar-os-testes', title: 'Como organizar os testes de anúncios' },
+      { id: 'e-onde-entra-o-gem', title: 'E onde entra o GEM, outra IA da Meta?' },
+      { id: 'perguntas-frequentes', title: 'Perguntas frequentes' },
+      { id: 'transforme-producao-em-aprendizado', title: 'Transforme produção de anúncios em aprendizado para o negócio' },
+      { id: 'fontes-oficiais', title: 'Fontes oficiais' },
+    ],
+    executiveSummary: [
+      'O Andromeda é o sistema de IA da Meta que atua na primeira etapa (retrieval) da recomendação de anúncios, filtrando bilhões de candidatos para um grupo menor e altamente relevante.',
+      'O recurso opera na infraestrutura interna da Meta — não é um botão a ser ativado no Gerenciador de Anúncios.',
+      'Para a empresa, o maior diferencial competitivo passa a ser trabalhar hipóteses reais de comunicação (motivos de compra distintos), conectar o clique ao CRM e acompanhar o resultado até a venda.',
+    ],
+    faqs: [
+      {
+        question: 'Quantos anúncios devo produzir?',
+        answer:
+          'Planeje a quantidade conforme as hipóteses prioritárias, o orçamento e a capacidade de análise. Um bom ponto de partida é listar o que a empresa precisa descobrir sobre o cliente e transformar essas perguntas em peças.',
+      },
+      {
+        question: 'Posso usar IA para criar os anúncios?',
+        answer:
+          'Sim. Ela pode apoiar roteiros, variações de texto e conceitos visuais. Na nossa recomendação de trabalho, a equipe revisa a precisão das informações, a identidade da marca e a coerência da oferta antes da publicação.',
+      },
+      {
+        question: 'O que devo cobrar de quem cuida do tráfego?',
+        answer:
+          'Peça clareza sobre quatro pontos: o objetivo do investimento, as hipóteses em teste, os resultados comerciais observados e a próxima decisão sugerida pelos dados.',
+      },
+    ],
+    sources: [
+      {
+        id: 1,
+        label:
+          'Engineering at Meta — Meta Andromeda: Powering the Next Generation of Ads Retrieval Through Model-System Co-Design (28/10/2026)',
+        url: 'https://engineering.fb.com/2026/10/28/ml-applications/meta-andromeda-next-gen-ads-retrieval-gpu-co-design/',
+      },
+      {
+        id: 2,
+        label:
+          'Engineering at Meta — Meta’s Generative Ads Model (GEM): Scaling the Central Model and Compute Engine for Frontier Ads AI (13/10/2026)',
+        url: 'https://engineering.fb.com/2026/10/13/ml-applications/generative-ads-model-gem-scaling-frontier-ads-ai/',
+      },
+    ],
+    relatedServiceSlugs: [
+      'gestao-de-trafego-pago',
+      'dados-e-analytics',
+      'sistemas-sob-medida',
+    ],
+  },
+  {
     title: 'Anúncios no Modo IA do Google: o que muda para as empresas brasileiras',
     slug: 'anuncios-modo-ia-google-brasil',
     seoTitle: 'Anúncios no Modo IA do Google: o que muda no Brasil',
