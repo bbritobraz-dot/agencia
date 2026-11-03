@@ -49,6 +49,115 @@ export interface BlogPost {
 
 export const RUNA_BLOG_POSTS: BlogPost[] = [
   {
+    title: 'Como preparar o site da sua empresa para aparecer nas buscas com IA',
+    slug: 'preparar-site-buscas-ia',
+    seoTitle: 'Como preparar seu site para as buscas com IA',
+    metaDescription:
+      'Veja como conteúdo útil, FAQ, SEO, velocidade e navegação clara ajudam a preparar o site da sua empresa para as buscas com inteligência artificial.',
+    excerpt:
+      'Seu site pode participar das respostas com IA e receber visitas pelos links apresentados. Entenda o que preparar no conteúdo, na estrutura e na experiência.',
+    author: 'Bruno',
+    authorRole: 'Fundador & Estrategista Digital na RUNA',
+    category: 'Sites e SEO',
+    tags: ['SEO', 'buscas com IA', 'Modo IA', 'sites', 'Core Web Vitals', 'WebMCP'],
+    date: '2026-11-03',
+    updated: '2026-11-03',
+    readingTime: '6 min de leitura',
+    status: 'published',
+    cover: {
+      png: '/blog/preparar-site-buscas-ia/capa-site-buscas-ia.png',
+      webp: '/blog/preparar-site-buscas-ia/capa-site-buscas-ia.webp',
+      avif: '/blog/preparar-site-buscas-ia/capa-site-buscas-ia.avif',
+      width: 1672,
+      height: 941,
+      alt: 'Ilustração de site empresarial em um notebook, cercado por cartões de conversa e links que representam a busca com inteligência artificial.',
+    },
+    toc: [
+      { id: 'o-seo-continua-sendo-a-base', title: 'O SEO continua sendo a base' },
+      { id: 'duvidas-do-comercial-em-conteudo', title: '1. Transforme dúvidas do comercial em conteúdo' },
+      { id: 'use-o-faq-para-facilitar-a-decisao', title: '2. Use o FAQ para facilitar a decisão' },
+      { id: 'prepare-a-parte-tecnica', title: '3. Prepare a parte técnica para o conteúdo ser encontrado' },
+      { id: 'faca-o-site-carregar-bem', title: '4. Faça o site carregar bem e responder rápido' },
+      { id: 'prepare-a-navegacao-para-pessoas-e-agentes', title: '5. Prepare a navegação para pessoas e agentes de IA' },
+      { id: 'como-isso-se-conecta-aos-anuncios', title: 'Como isso se conecta aos anúncios?' },
+      { id: 'o-que-acompanhar-depois', title: 'O que acompanhar depois das melhorias' },
+      { id: 'por-onde-comecar', title: 'Por onde começar na sua empresa' },
+      { id: 'fontes-oficiais', title: 'Fontes oficiais' },
+    ],
+    executiveSummary: [
+      'As respostas geradas por IA no Google trazem links de apoio para páginas indexadas que fundamentam a resposta — o SEO técnico e de conteúdo continua sendo o pilar central.',
+      'Transformar dúvidas reais de pré-venda e FAQs claras em conteúdo textual acessível gera tanto autoridade orgânica para robôs quanto facilidade de decisão para humanos.',
+      'Experiência do usuário (Core Web Vitals) e mensuração conectada ao CRM garantem que o tráfego conquistado se transforme em oportunidades comerciais qualificadas.',
+    ],
+    faqs: [
+      {
+        question: 'Preciso criar um arquivo llms.txt para ser citado pelo Google?',
+        answer:
+          'Não. O Google Search Central esclarece que o arquivo llms.txt não é utilizado pela Pesquisa Google para ranking ou visibilidade em IA. O foco deve ser conteúdo útil em páginas indexadas.',
+        citations: [2],
+      },
+      {
+        question: 'O recurso de resultados enriquecidos de FAQ continua funcionando?',
+        answer:
+          'O Google retirou os resultados visuais especiais de FAQ da Pesquisa em 2026. A seção de perguntas frequentes continua sendo muito recomendada, mas como recurso editorial para leitura e indexação de respostas.',
+        citations: [3],
+      },
+      {
+        question: 'O que é o WebMCP para agentes de IA?',
+        answer:
+          'O WebMCP é um padrão em fase experimental (origin trial do Chrome) para expor ações do site a agentes autônomos. Não é um fator de ranking nem requisito de SEO obrigatório.',
+        citations: [7],
+      },
+    ],
+    sources: [
+      {
+        id: 1,
+        label: 'Google Search Central — AI features and your website',
+        url: 'https://developers.google.com/search/docs/appearance/ai-features',
+      },
+      {
+        id: 2,
+        label: 'Google Search Central — Optimizing your website for generative AI features on Google Search',
+        url: 'https://developers.google.com/search/docs/fundamentals/ai-optimization-guide',
+      },
+      {
+        id: 3,
+        label: 'Google Search Central — Histórico de atualizações da documentação',
+        url: 'https://developers.google.com/search/updates',
+      },
+      {
+        id: 4,
+        label: 'Google Search Central — Introdução ao robots.txt',
+        url: 'https://developers.google.com/search/docs/crawling-indexing/robots/intro',
+      },
+      {
+        id: 5,
+        label: 'Search Console — Search generative AI control',
+        url: 'https://support.google.com/webmasters/answer/16908024',
+      },
+      {
+        id: 6,
+        label: 'Google Search Central — Core Web Vitals e resultados de pesquisa',
+        url: 'https://developers.google.com/search/docs/appearance/core-web-vitals',
+      },
+      {
+        id: 7,
+        label: 'Chrome for Developers — Join the WebMCP origin trial (09/06/2026)',
+        url: 'https://developer.chrome.com/blog/ai-webmcp-origin-trial',
+      },
+      {
+        id: 8,
+        label: 'Google Ads — Sobre a classificação do anúncio',
+        url: 'https://support.google.com/google-ads/answer/1722122?hl=pt-BR',
+      },
+    ],
+    relatedServiceSlugs: [
+      'sites-e-landing-pages',
+      'dados-e-analytics',
+      'automacoes-e-ia',
+    ],
+  },
+  {
     title: 'Meta Andromeda: como a IA seleciona anúncios e o que muda para sua empresa',
     slug: 'meta-andromeda-ia-anuncios',
     seoTitle: 'Meta Andromeda: o que muda nos anúncios da sua empresa',

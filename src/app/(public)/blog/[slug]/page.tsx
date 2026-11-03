@@ -13,6 +13,7 @@ import {
 import { ServiceIcon } from '@/components/public/ServiceIcon';
 import { GoogleModoIaArticleContent } from '@/components/blog/GoogleModoIaArticleContent';
 import { MetaAndromedaArticleContent } from '@/components/blog/MetaAndromedaArticleContent';
+import { SiteBuscasIaArticleContent } from '@/components/blog/SiteBuscasIaArticleContent';
 import {
   ArrowLeft,
   ArrowRight,
@@ -356,7 +357,9 @@ export default async function BlogArticlePage({ params }: PageProps) {
               </div>
 
               {/* Dynamic Article Content based on slug */}
-              {post.slug === 'meta-andromeda-ia-anuncios' ? (
+              {post.slug === 'preparar-site-buscas-ia' ? (
+                <SiteBuscasIaArticleContent post={post} />
+              ) : post.slug === 'meta-andromeda-ia-anuncios' ? (
                 <MetaAndromedaArticleContent post={post} />
               ) : (
                 <GoogleModoIaArticleContent post={post} />
