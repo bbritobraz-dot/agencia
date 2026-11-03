@@ -49,7 +49,7 @@ export function Footer() {
                 className="flex items-center gap-2 hover:text-white transition-colors"
               >
                 <MessageCircle className="h-4 w-4 text-[#C97F38]" />
-                +55 (45) 98431-7910
+                +55 (45) 98822-9849
               </a>
             </div>
           </div>

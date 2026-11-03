@@ -55,7 +55,7 @@ export default async function ContatoPage({
                     <MessageCircle className="h-5 w-5 text-[#25D366]" />
                     <div>
                       <div className="text-xs text-[#4c524b]">WhatsApp Comercial</div>
-                      <div className="font-semibold">+55 (45) 98431-7910</div>
+                      <div className="font-semibold">+55 (45) 98822-9849</div>
                     </div>
                   </a>
 

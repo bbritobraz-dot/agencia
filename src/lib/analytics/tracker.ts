@@ -197,7 +197,7 @@ export function trackRunaEvent(
 }
 
 export function buildRunaWhatsAppUrl(customMessage?: string): string {
-  const number = process.env.NEXT_PUBLIC_RUNA_WHATSAPP || '554584317910';
+  const number = process.env.NEXT_PUBLIC_RUNA_WHATSAPP || '5545988229849';
   const cleanNumber = number.replace(/\D/g, '');
   const defaultMsg =
     'Olá! Vim pelo site da RUNA e gostaria de conversar sobre soluções de marketing, tecnologia e automação para minha empresa.';
