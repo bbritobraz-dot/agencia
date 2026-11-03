@@ -87,42 +87,34 @@ export function LeadDetailClient({
   const handleStageChange = async (newStage: PipelineStageSlug) => {
     if (newStage === lead.stage_slug) return;
     const prevStage = lead.stage_slug;
-    const prevLabel = getStageLabel(prevStage);
     const nextLabel = getStageLabel(newStage);
 
-    const supabase = createClient();
-    const { data: updated } = await supabase
-      .from('leads')
-      .update({
+    try {
+      const response = await fetch('/api/admin/leads/stage-transition', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          leadId: lead.id,
+          targetStage: newStage,
+        }),
+      });
+
+      const resJson = await response.json();
+      if (!response.ok || !resJson.success) {
+        alert(resJson.error || 'Erro ao atualizar estágio do lead.');
+        return;
+      }
+
+      setLead((prev) => ({
+        ...prev,
         stage_slug: newStage,
         commercial_status: nextLabel,
-      })
-      .eq('id', lead.id)
-      .select('*')
-      .single();
+      }));
 
-    if (updated) {
-      setLead(updated as LeadRecord);
+      router.refresh();
+    } catch {
+      alert('Falha na comunicação ao atualizar etapa.');
     }
-
-    const { data: act } = await supabase
-      .from('lead_activities')
-      .insert({
-        lead_id: lead.id,
-        actor_name: adminName,
-        activity_type: 'stage_changed',
-        from_stage: prevStage,
-        to_stage: newStage,
-        title: `Status comercial alterado: ${prevLabel} → ${nextLabel}`,
-        description: `Etapa atualizada na ficha do lead por ${adminName}.`,
-      })
-      .select('*')
-      .single();
-
-    if (act) {
-      setActivities((prev) => [act as LeadActivityRecord, ...prev]);
-    }
-    router.refresh();
   };
 
   const handleSaveLeadInfo = async (e: React.FormEvent) => {

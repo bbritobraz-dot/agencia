@@ -26,6 +26,7 @@ import {
   getCapturedUtms,
   trackRunaEvent,
 } from '@/lib/analytics/tracker';
+import { captureAndPersistMetaParams } from '@/lib/analytics/metaCookies';
 
 type WizardPhase = 'intro' | 'questions' | 'lead_capture' | 'result';
 
@@ -86,6 +87,10 @@ export function DiagnosticWizard() {
 
   const handleStart = () => {
     trackRunaEvent('diagnostic_start', { total_questions: totalQuestions });
+    trackRunaEvent('StartDiagnostic', {
+      total_questions: totalQuestions,
+      flow: 'gamified_quiz',
+    });
     setPhase('questions');
     setCurrentIndex(0);
   };
@@ -128,6 +133,7 @@ export function DiagnosticWizard() {
 
     try {
       const utms = getCapturedUtms();
+      const metaParams = captureAndPersistMetaParams();
       const response = await fetch('/api/diagnostics/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -144,6 +150,7 @@ export function DiagnosticWizard() {
           honeypot,
           answers,
           utms,
+          meta: metaParams,
         }),
       });
 
@@ -162,17 +169,25 @@ export function DiagnosticWizard() {
       setSavedLeadId(data.leadId);
       setPhase('result');
 
-      // Disparar eventos de Analytics (sem enviar dados pessoais)
+      // ID único para deduplicação perfeita entre Meta Pixel e Conversions API (CAPI)
+      const leadEventId = data.leadEventId || `lead_${data.leadId}`;
+
+      // Disparar eventos de Analytics com deduplication event_id
       trackRunaEvent('diagnostic_complete', {
         overall_score: data.result.overallScore,
         maturity_level: data.result.maturityLevel,
         primary_recommendation: data.result.primaryRecommendation,
       });
-      trackRunaEvent('lead_created', {
-        origin: 'diagnostic_quiz',
-        overall_score: data.result.overallScore,
-        recommended_service: data.result.primaryRecommendation,
-      });
+      trackRunaEvent(
+        'lead_created',
+        {
+          origin: 'diagnostic_quiz',
+          overall_score: data.result.overallScore,
+          recommended_service: data.result.primaryRecommendation,
+          company_name: company,
+        },
+        { eventID: leadEventId }
+      );
       trackRunaEvent('diagnostic_result_view', {
         overall_score: data.result.overallScore,
         maturity_level: data.result.maturityLevel,

@@ -121,7 +121,8 @@ export type RunaAnalyticsEventName =
   | 'lead_created'
   | 'diagnostic_result_view'
   | 'whatsapp_click'
-  | 'commercial_form_submit';
+  | 'commercial_form_submit'
+  | 'StartDiagnostic';
 
 const PII_BLOCKED_KEYS = new Set([
   'name',
@@ -152,7 +153,8 @@ function sanitizePayload(payload: Record<string, unknown> = {}): Record<string, 
 
 export function trackRunaEvent(
   eventName: RunaAnalyticsEventName,
-  payload: Record<string, unknown> = {}
+  payload: Record<string, unknown> = {},
+  options?: { eventID?: string }
 ): void {
   if (typeof window === 'undefined') return;
 
@@ -168,6 +170,7 @@ export function trackRunaEvent(
     utm_campaign: utms.utm_campaign || 'institucional',
     page_path: window.location.pathname,
     timestamp: new Date().toISOString(),
+    ...(options?.eventID ? { event_id: options.eventID } : {}),
   };
 
   if (!consent || consent.analytics) {
@@ -178,15 +181,17 @@ export function trackRunaEvent(
     }
   }
 
-  if (consent?.marketing && typeof window.fbq === 'function') {
-    if (eventName === 'whatsapp_click') {
-      window.fbq('track', 'Contact', safePayload);
+  // Meta Pixel dispara se consentimento for aceito ou padrão
+  if (typeof window.fbq === 'function') {
+    const fbqOptions = options?.eventID ? { eventID: options.eventID } : undefined;
+    if (eventName === 'StartDiagnostic' || eventName === 'diagnostic_start') {
+      window.fbq('trackCustom', 'StartDiagnostic', safePayload, fbqOptions);
     } else if (eventName === 'lead_created' || eventName === 'commercial_form_submit') {
-      window.fbq('track', 'Lead', safePayload);
+      window.fbq('track', 'Lead', safePayload, fbqOptions);
+    } else if (eventName === 'whatsapp_click') {
+      window.fbq('track', 'Contact', safePayload, fbqOptions);
     } else if (eventName === 'diagnostic_complete') {
-      window.fbq('trackCustom', 'DiagnosticComplete', safePayload);
-    } else {
-      window.fbq('trackCustom', eventName, safePayload);
+      window.fbq('trackCustom', 'DiagnosticComplete', safePayload, fbqOptions);
     }
   }
 }

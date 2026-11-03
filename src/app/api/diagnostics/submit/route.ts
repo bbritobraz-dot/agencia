@@ -8,6 +8,7 @@ import {
 } from '@/lib/security/rateLimiter';
 import { createAdminServiceClient } from '@/lib/supabase/admin';
 import { normalizePhoneBR } from '@/lib/utils/phone';
+import { sendMetaCapiEvent } from '@/lib/meta/capiClient';
 
 export async function POST(request: NextRequest) {
   try {
@@ -100,6 +101,9 @@ export async function POST(request: NextRequest) {
     const calculation = calculateDiagnosticResult(rawAnswers);
 
     const utms = body.utms || {};
+    const meta = body.meta || {};
+    const userAgent = request.headers.get('user-agent') || '';
+
     const utmSource = sanitizeText(utms.utm_source, 100) || null;
     const utmMedium = sanitizeText(utms.utm_medium, 100) || null;
     const utmCampaign = sanitizeText(utms.utm_campaign, 120) || null;
@@ -107,6 +111,10 @@ export async function POST(request: NextRequest) {
     const utmContent = sanitizeText(utms.utm_content, 120) || null;
     const referrer = sanitizeText(utms.referrer, 250) || null;
     const landingPage = sanitizeText(utms.landing_page, 180) || '/diagnostico';
+
+    const fbp = sanitizeText(meta.fbp, 120) || null;
+    const fbc = sanitizeText(meta.fbc, 160) || null;
+    const fbclid = sanitizeText(meta.fbclid, 250) || null;
 
     const supabase = createAdminServiceClient();
 
@@ -137,6 +145,11 @@ export async function POST(request: NextRequest) {
         utm_content: utmContent,
         referrer,
         landing_page: landingPage,
+        fbp,
+        fbc,
+        fbclid,
+        client_ip_address: ip !== 'unknown' ? ip : null,
+        client_user_agent: userAgent || null,
         privacy_consent: privacyConsent,
         marketing_consent: marketingConsent,
         consented_at: new Date().toISOString(),
@@ -246,9 +259,68 @@ export async function POST(request: NextRequest) {
       },
     ]);
 
+    // 6. Disparo Server-Side da Meta Conversions API (CAPI) para evento 'Lead'
+    const leadEventId = `lead_${leadRecord.id}`;
+    const nowIso = new Date().toISOString();
+
+    try {
+      const capiResult = await sendMetaCapiEvent({
+        eventName: 'Lead',
+        eventId: leadEventId,
+        eventTime: Math.floor(Date.now() / 1000),
+        eventSourceUrl: `https://airuna.com.br${landingPage}`,
+        actionSource: 'website',
+        userData: {
+          email,
+          phone: whatsapp,
+          firstName: name,
+          clientIpAddress: ip !== 'unknown' ? ip : null,
+          clientUserAgent: userAgent || null,
+          fbp,
+          fbc,
+        },
+        customData: {
+          lead_id: leadRecord.id,
+          content_name: 'Diagnóstico Digital RUNA',
+          overall_score: calculation.overallScore,
+          maturity_level: calculation.maturityLevel,
+          primary_recommendation: calculation.primaryRecommendation,
+        },
+      });
+
+      // Registrar auditoria em conversion_events
+      await supabase.from('conversion_events').insert({
+        lead_id: leadRecord.id,
+        event_name: 'Lead',
+        event_id: leadEventId,
+        stage_slug: 'novo_lead',
+        action_source: 'website',
+        status: capiResult.success ? 'sent' : 'failed',
+        attempts: 1,
+        last_error: capiResult.error || null,
+        meta_response: capiResult.rawResponse || null,
+        event_time: nowIso,
+        sent_at: capiResult.success ? nowIso : null,
+      });
+    } catch (capiErr) {
+      console.error('[CAPI Lead Error]', capiErr);
+      await supabase.from('conversion_events').insert({
+        lead_id: leadRecord.id,
+        event_name: 'Lead',
+        event_id: leadEventId,
+        stage_slug: 'novo_lead',
+        action_source: 'website',
+        status: 'failed',
+        attempts: 1,
+        last_error: capiErr instanceof Error ? capiErr.message : 'Erro ao despachar CAPI',
+        event_time: nowIso,
+      });
+    }
+
     return NextResponse.json({
       success: true,
       leadId: leadRecord.id,
+      leadEventId,
       submissionId: submissionRecord.id,
       result: calculation,
     });
