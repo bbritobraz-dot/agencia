@@ -3,7 +3,12 @@ import Link from 'next/link';
 import { Mail, MapPin, MessageCircle, Sparkles } from 'lucide-react';
 import { ContactForm } from '@/components/public/ContactForm';
 import { getServiceBySlug } from '@/config/services';
-import { buildRunaWhatsAppUrl } from '@/lib/analytics/tracker';
+
+const WHATSAPP_NUMBER = '5545988229849';
+const WHATSAPP_DEFAULT_MSG = encodeURIComponent(
+  'Olá! Vim pelo site da RUNA e gostaria de conversar sobre soluções de marketing, tecnologia e automação para minha empresa.'
+);
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_DEFAULT_MSG}`;
 
 export const metadata: Metadata = {
   title: 'Contato Comercial — Fale com a RUNA',
@@ -47,7 +52,7 @@ export default async function ContatoPage({
                 </h2>
                 <div className="space-y-3 text-sm text-[#4c524b]">
                   <a
-                    href={buildRunaWhatsAppUrl()}
+                    href={WHATSAPP_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 rounded-xl border border-[#d8d7cf] bg-white p-3.5 font-medium text-[#1c1c10] hover:border-[#27594F]"
