@@ -18,7 +18,7 @@ const libreCaslon = Libre_Caslon_Text({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://runamkt.com.br'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://airuna.com.br'),
   title: {
     default: 'RUNA — Marketing, Tecnologia e Automação para Empresas',
     template: '%s | RUNA',

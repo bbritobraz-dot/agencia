@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     'Artigos, análises estratégicas e guias práticos sobre Google Ads, Inteligência Artificial, SEO, Sites de Alta Conversão e Automação Comercial.',
   alternates: {
-    canonical: 'https://runamkt.com.br/blog',
+    canonical: 'https://airuna.com.br/blog',
   },
 };
 

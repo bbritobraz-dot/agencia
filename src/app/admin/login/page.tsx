@@ -135,7 +135,7 @@ function AdminLoginContent() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@runamkt.com.br"
+                placeholder="admin@airuna.com.br"
                 className="w-full rounded-xl border border-[#27594F] bg-[#13302a] px-4 py-3 text-sm text-white placeholder-[#C1C0AC]/50 focus:border-[#C97F38] focus:outline-none"
               />
             </div>

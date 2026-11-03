@@ -73,8 +73,8 @@ export default function PoliticaDePrivacidadePage() {
             </h2>
             <p className="text-[#4c524b]">
               Você pode solicitar a confirmação de tratamento, acesso, correção, anonimização ou exclusão dos seus dados a qualquer momento enviando uma solicitação para{' '}
-              <a href="mailto:contato@runamkt.com.br" className="text-[#C97F38] font-semibold underline">
-                contato@runamkt.com.br
+              <a href="mailto:contato@airuna.com.br" className="text-[#C97F38] font-semibold underline">
+                contato@airuna.com.br
               </a>
               .
             </p>

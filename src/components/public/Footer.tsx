@@ -35,11 +35,11 @@ export function Footer() {
                 Foz do Iguaçu, PR — Atendimento Nacional
               </span>
               <a
-                href="mailto:contato@runamkt.com.br"
+                href="mailto:contato@airuna.com.br"
                 className="flex items-center gap-2 hover:text-white transition-colors"
               >
                 <Mail className="h-4 w-4 text-[#C97F38]" />
-                contato@runamkt.com.br
+                contato@airuna.com.br
               </a>
               <a
                 href={buildRunaWhatsAppUrl()}

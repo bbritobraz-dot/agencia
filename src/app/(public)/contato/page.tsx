@@ -60,13 +60,13 @@ export default async function ContatoPage({
                   </a>
 
                   <a
-                    href="mailto:contato@runamkt.com.br"
+                    href="mailto:contato@airuna.com.br"
                     className="flex items-center gap-3 rounded-xl border border-[#d8d7cf] bg-white p-3.5 font-medium text-[#1c1c10] hover:border-[#27594F]"
                   >
                     <Mail className="h-5 w-5 text-[#C97F38]" />
                     <div>
                       <div className="text-xs text-[#4c524b]">E-mail Corporativo</div>
-                      <div className="font-semibold">contato@runamkt.com.br</div>
+                      <div className="font-semibold">contato@airuna.com.br</div>
                     </div>
                   </a>
 

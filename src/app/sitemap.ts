@@ -3,7 +3,7 @@ import { RUNA_SERVICES } from '@/config/services';
 import { RUNA_BLOG_POSTS } from '@/config/blog';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runamkt.com.br';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://airuna.com.br';
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [

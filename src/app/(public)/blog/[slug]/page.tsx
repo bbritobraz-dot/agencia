@@ -33,7 +33,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-const SITE_DOMAIN = 'https://runamkt.com.br';
+const SITE_DOMAIN = 'https://airuna.com.br';
 
 export async function generateStaticParams() {
   return RUNA_BLOG_POSTS.map((post) => ({
