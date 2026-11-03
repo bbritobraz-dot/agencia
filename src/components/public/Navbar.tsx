@@ -131,6 +131,17 @@ export function Navbar() {
           </Link>
 
           <Link
+            href="/blog"
+            className={`text-sm font-medium transition-colors ${
+              isActive('/blog')
+                ? 'text-[#C97F38] font-semibold'
+                : 'text-[#1c1c10]/85 hover:text-[#27594F]'
+            }`}
+          >
+            Blog
+          </Link>
+
+          <Link
             href="/contato"
             className={`text-sm font-medium transition-colors ${
               isActive('/contato')
@@ -225,6 +236,13 @@ export function Navbar() {
               className="rounded-lg px-3 py-2.5 text-base font-medium text-[#1c1c10] hover:bg-[#E8E7DF]"
             >
               Sobre a RUNA
+            </Link>
+            <Link
+              href="/blog"
+              onClick={() => setMobileOpen(false)}
+              className="rounded-lg px-3 py-2.5 text-base font-medium text-[#1c1c10] hover:bg-[#E8E7DF]"
+            >
+              Blog
             </Link>
             <Link
               href="/contato"

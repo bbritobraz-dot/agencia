@@ -20,6 +20,7 @@ import {
   RUNA_PROJECTS_CONFIG,
 } from '@/config/projects';
 import { DIAGNOSTIC_QUESTIONS } from '@/config/diagnosticQuestions';
+import { RUNA_BLOG_POSTS, formatBlogDate } from '@/config/blog';
 import { ServiceIcon } from '@/components/public/ServiceIcon';
 import { buildRunaWhatsAppUrl, trackRunaEvent } from '@/lib/analytics/tracker';
 
@@ -558,6 +559,96 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 6.5. BLOG & INTELIGÊNCIA DIGITAL */}
+      <section className="py-24 bg-[#fcfae5] border-b border-[#d8d7cf]" id="blog">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div className="max-w-2xl space-y-3">
+              <span className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">
+                — Blog & Inteligência Digital RUNA
+              </span>
+              <h2 className="font-display text-3xl sm:text-4xl text-[#1c1c10]">
+                Análises estratégicas sobre busca, IA e crescimento comercial.
+              </h2>
+            </div>
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#27594F] hover:text-[#C97F38]"
+            >
+              Ver todos os artigos
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {RUNA_BLOG_POSTS.filter((p) => p.status === 'published')
+            .slice(0, 1)
+            .map((post) => (
+              <div
+                key={post.slug}
+                className="group overflow-hidden rounded-3xl border border-[#d8d7cf] bg-[#E8E7DF]/60 shadow-sm transition-all hover:border-[#C97F38]/70 hover:shadow-md"
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-12">
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="lg:col-span-6 block overflow-hidden bg-[#0D342C] flex items-center justify-center"
+                  >
+                    <picture className="block w-full">
+                      <source srcSet={post.cover.avif} type="image/avif" />
+                      <source srcSet={post.cover.webp} type="image/webp" />
+                      <img
+                        src={post.cover.png}
+                        alt={post.cover.alt}
+                        width={post.cover.width}
+                        height={post.cover.height}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-auto block transition-transform duration-500 group-hover:scale-[1.02]"
+                      />
+                    </picture>
+                  </Link>
+
+                  <div className="lg:col-span-6 flex flex-col justify-between p-6 sm:p-8 lg:p-10">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2.5 text-xs text-[#4c524b]">
+                        <span className="rounded-full bg-[#C97F38]/15 px-3 py-1 font-semibold uppercase tracking-wider text-[#b06b29]">
+                          {post.category}
+                        </span>
+                        <span>•</span>
+                        <span>{formatBlogDate(post.date)}</span>
+                        <span>•</span>
+                        <span>{post.readingTime}</span>
+                      </div>
+
+                      <Link href={`/blog/${post.slug}`} className="mt-4 block">
+                        <h3 className="font-display text-2xl sm:text-3xl text-[#1c1c10] group-hover:text-[#27594F] transition-colors">
+                          {post.title}
+                        </h3>
+                      </Link>
+
+                      <p className="mt-3 text-sm sm:text-base text-[#4c524b] leading-relaxed">
+                        {post.excerpt}
+                      </p>
+                    </div>
+
+                    <div className="mt-6 pt-5 border-t border-[#d8d7cf] flex items-center justify-between">
+                      <span className="text-xs font-semibold text-[#1c1c10]">
+                        Por {post.author} · {post.authorRole}
+                      </span>
+                      <Link
+                        href={`/blog/${post.slug}`}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-[#1e4840] px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-[#27594F]"
+                      >
+                        Ler artigo completo
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
         </div>
       </section>
 
