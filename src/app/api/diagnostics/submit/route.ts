@@ -10,6 +10,8 @@ import { createAdminServiceClient } from '@/lib/supabase/admin';
 import { normalizePhoneBR } from '@/lib/utils/phone';
 import { sendMetaCapiEvent } from '@/lib/meta/capiClient';
 
+const GENERIC_SAVE_ERROR = 'Não conseguimos salvar seu diagnóstico agora. Tente novamente em instantes.';
+
 export async function POST(request: NextRequest) {
   try {
     const ip =
@@ -158,12 +160,9 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (leadError || !leadRecord) {
-      return NextResponse.json(
-        {
-          error: `Erro ao salvar lead no Supabase: ${leadError?.message || 'Falha desconhecida'}`,
-        },
-        { status: 500 }
-      );
+      // Detalhe técnico só nos logs do servidor; o visitante recebe mensagem genérica
+      console.error('[diagnostic] falha ao inserir lead:', leadError?.message || 'sem registro retornado');
+      return NextResponse.json({ error: GENERIC_SAVE_ERROR }, { status: 500 });
     }
 
     // 2. Salvar submissão do diagnóstico
@@ -186,12 +185,8 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (submissionError || !submissionRecord) {
-      return NextResponse.json(
-        {
-          error: `Erro ao registrar submissão do diagnóstico: ${submissionError?.message}`,
-        },
-        { status: 500 }
-      );
+      console.error('[diagnostic] falha ao inserir submissão:', submissionError?.message || 'sem registro retornado');
+      return NextResponse.json({ error: GENERIC_SAVE_ERROR }, { status: 500 });
     }
 
     // 3. Salvar as 8 respostas detalhadas
@@ -214,12 +209,8 @@ export async function POST(request: NextRequest) {
       .insert(answerRows);
 
     if (answersError) {
-      return NextResponse.json(
-        {
-          error: `Erro ao salvar respostas do diagnóstico: ${answersError.message}`,
-        },
-        { status: 500 }
-      );
+      console.error('[diagnostic] falha ao inserir respostas:', answersError.message);
+      return NextResponse.json({ error: GENERIC_SAVE_ERROR }, { status: 500 });
     }
 
     // 4. Criar oportunidade comercial vinculada ao serviço primário recomendado
@@ -325,8 +316,7 @@ export async function POST(request: NextRequest) {
       result: calculation,
     });
   } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : 'Erro interno ao processar o diagnóstico.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('[diagnostic] erro inesperado:', err instanceof Error ? err.message : err);
+    return NextResponse.json({ error: GENERIC_SAVE_ERROR }, { status: 500 });
   }
 }

@@ -1,19 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Mail, MapPin, MessageCircle, Sparkles } from 'lucide-react';
-import { ContactForm } from '@/components/public/ContactForm';
+import { ArrowRight, Mail, MapPin } from 'lucide-react';
+import { ContactForm, ContactWhatsAppCard } from '@/components/public/ContactForm';
 import { getServiceBySlug } from '@/config/services';
 
-const WHATSAPP_NUMBER = '5545988229849';
-const WHATSAPP_DEFAULT_MSG = encodeURIComponent(
-  'Olá! Vim pelo site da RUNA e gostaria de conversar sobre soluções de marketing, tecnologia e automação para minha empresa.'
-);
-const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_DEFAULT_MSG}`;
+const CONTACT_EMAIL = 'contato@airuna.com.br';
 
 export const metadata: Metadata = {
-  title: 'Contato Comercial — Fale com a RUNA',
+  title: 'Contato — Fale com a RUNA',
   description:
-    'Entre em contato com a equipe consultiva da RUNA para projetos de tráfego pago, sites, e-commerce, automações com IA, sistemas sob medida e analytics.',
+    'Fale com a RUNA pelo WhatsApp, e-mail ou formulário sobre tráfego pago, sites, e-commerce, automações com IA, sistemas sob medida e dados.',
 };
 
 export default async function ContatoPage({
@@ -26,86 +22,63 @@ export default async function ContatoPage({
 
   return (
     <div>
-      <section className="bg-runa-pattern-dark py-16 text-white border-b border-[#27594F]">
+      <section className="border-b border-[#27594F] bg-runa-pattern-dark py-14 text-white lg:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">
-              — Atendimento Consultivo
-            </span>
-            <h1 className="font-display text-4xl sm:text-5xl text-white">
-              Converse com a equipe da RUNA.
-            </h1>
-            <p className="text-base text-[#E8E7DF]/85">
-              Preencha o formulário abaixo para registrar sua demanda diretamente em nosso CRM interno ou realize nosso Diagnóstico Digital de 8 perguntas.
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">— Contato</span>
+            <h1 className="font-display text-4xl leading-tight text-white sm:text-5xl">Vamos conversar?</h1>
+            <p className="text-base text-[#E8E7DF]/85 sm:text-lg">
+              {matchedService
+                ? `Conte como podemos ajudar com ${matchedService.title}. Respondemos pelo WhatsApp ou e-mail.`
+                : 'Conte o que sua empresa precisa. Respondemos pelo WhatsApp ou e-mail.'}
             </p>
           </div>
         </div>
       </section>
 
-      <section className="py-20 bg-[#E8E7DF]">
+      <section className="bg-[#E8E7DF] py-14 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-            <div className="lg:col-span-4 space-y-6">
-              <div className="rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 space-y-4">
-                <h2 className="font-display text-2xl text-[#1c1c10]">
-                  Canais Diretos
-                </h2>
-                <div className="space-y-3 text-sm text-[#4c524b]">
-                  <a
-                    href={WHATSAPP_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 rounded-xl border border-[#d8d7cf] bg-white p-3.5 font-medium text-[#1c1c10] hover:border-[#27594F]"
-                  >
-                    <MessageCircle className="h-5 w-5 text-[#25D366]" />
-                    <div>
-                      <div className="text-xs text-[#4c524b]">WhatsApp Comercial</div>
-                      <div className="font-semibold">+55 (45) 98822-9849</div>
-                    </div>
-                  </a>
+          <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-10">
+            {/* Formulário primeiro no celular */}
+            <div className="order-2 space-y-4 lg:order-1 lg:col-span-4">
+              <ContactWhatsAppCard />
 
-                  <a
-                    href="mailto:contato@airuna.com.br"
-                    className="flex items-center gap-3 rounded-xl border border-[#d8d7cf] bg-white p-3.5 font-medium text-[#1c1c10] hover:border-[#27594F]"
-                  >
-                    <Mail className="h-5 w-5 text-[#C97F38]" />
-                    <div>
-                      <div className="text-xs text-[#4c524b]">E-mail Corporativo</div>
-                      <div className="font-semibold">contato@airuna.com.br</div>
-                    </div>
-                  </a>
-
-                  <div className="flex items-center gap-3 rounded-xl border border-[#d8d7cf] bg-white p-3.5 text-[#1c1c10]">
-                    <MapPin className="h-5 w-5 text-[#27594F]" />
-                    <div>
-                      <div className="text-xs text-[#4c524b]">Base Operacional</div>
-                      <div className="font-semibold">Foz do Iguaçu, PR · Brasil</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-3xl bg-[#1e4840] p-6 text-white space-y-3">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#C97F38]">
-                  Recomendado antes da reunião
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="flex items-center gap-3 rounded-2xl border border-[#d8d7cf] bg-[#fcfae5] p-4 text-[#1c1c10] transition-colors hover:border-[#27594F]"
+              >
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#27594F]/10 text-[#27594F]">
+                  <Mail className="h-5 w-5" />
                 </span>
-                <h3 className="font-display text-xl">
-                  Prefere receber um diagnóstico automático agora?
-                </h3>
-                <p className="text-xs text-[#E8E7DF]/85 leading-relaxed">
-                  Em 8 perguntas rápidas, nosso sistema calcula a pontuação da sua empresa e aponta as oportunidades prioritárias.
-                </p>
-                <Link
-                  href="/diagnostico"
-                  className="inline-flex items-center gap-2 rounded-xl bg-[#C97F38] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#b06b29]"
-                >
-                  <Sparkles className="h-4 w-4" />
-                  Ir para o Diagnóstico Digital
-                </Link>
+                <span>
+                  <span className="block text-xs text-[#4c524b]">E-mail</span>
+                  <span className="block text-sm font-semibold">{CONTACT_EMAIL}</span>
+                </span>
+              </a>
+
+              <div className="flex items-center gap-3 rounded-2xl border border-[#d8d7cf] bg-[#fcfae5] p-4 text-[#1c1c10]">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#27594F]/10 text-[#27594F]">
+                  <MapPin className="h-5 w-5" />
+                </span>
+                <span>
+                  <span className="block text-xs text-[#4c524b]">Base</span>
+                  <span className="block text-sm font-semibold">Foz do Iguaçu, PR · atendimento em todo o Brasil</span>
+                </span>
               </div>
+
+              <Link
+                href="/diagnostico"
+                className="group flex items-center justify-between gap-3 rounded-2xl border border-[#C97F38]/40 bg-[#C97F38]/10 p-4 text-sm text-[#1c1c10] transition-colors hover:bg-[#C97F38]/15"
+              >
+                <span>
+                  <span className="block font-semibold">Ainda não sabe o que precisa?</span>
+                  <span className="block text-xs text-[#4c524b]">Faça o diagnóstico gratuito em 2 minutos.</span>
+                </span>
+                <ArrowRight className="h-4 w-4 shrink-0 text-[#C97F38] transition-transform group-hover:translate-x-1" />
+              </Link>
             </div>
 
-            <div className="lg:col-span-8">
+            <div className="order-1 lg:order-2 lg:col-span-8">
               <ContactForm initialService={matchedService?.title} />
             </div>
           </div>

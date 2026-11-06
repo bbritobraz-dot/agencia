@@ -1,26 +1,35 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, animate, useReducedMotion } from 'framer-motion';
 import {
+  AlertCircle,
+  AlertTriangle,
   ArrowLeft,
   ArrowRight,
-  CheckCircle2,
-  AlertTriangle,
-  Sparkles,
-  Loader2,
-  MessageCircle,
-  Trophy,
   BarChart3,
-  AlertCircle,
+  CheckCircle2,
+  Clock,
+  Gift,
+  LineChart,
+  Loader2,
+  Lock,
+  MessageCircle,
+  RotateCcw,
+  Sparkles,
 } from 'lucide-react';
 import {
   BUSINESS_SEGMENTS,
+  DIAGNOSTIC_CATEGORY_LABELS,
   DIAGNOSTIC_QUESTIONS,
   REVENUE_RANGES,
+  type DiagnosticCategoryKey,
 } from '@/config/diagnosticQuestions';
-import { DiagnosticCalculationResult } from '@/lib/diagnostic/scoringEngine';
+import {
+  calculateDiagnosticResult,
+  type DiagnosticCalculationResult,
+} from '@/lib/diagnostic/scoringEngine';
 import {
   buildRunaWhatsAppUrl,
   getCapturedUtms,
@@ -30,10 +39,113 @@ import { captureAndPersistMetaParams } from '@/lib/analytics/metaCookies';
 
 type WizardPhase = 'intro' | 'questions' | 'lead_capture' | 'result';
 
-export function DiagnosticWizard() {
-  const [phase, setPhase] = useState<WizardPhase>('intro');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+const EASE = [0.22, 1, 0.36, 1] as const;
+const CATEGORY_ORDER = Object.keys(DIAGNOSTIC_CATEGORY_LABELS) as DiagnosticCategoryKey[];
+
+/* ---------------- Resultado salvo no navegador (sobrevive a recarregar) ---------------- */
+const STORAGE_KEY = 'runa_diagnostic_result_v1';
+const STORAGE_TTL_MS = 6 * 60 * 60 * 1000; // 6 horas
+
+interface SavedResult {
+  result: DiagnosticCalculationResult;
+  company: string;
+  savedAt: number;
+}
+
+function subscribeStorage(cb: () => void) {
+  window.addEventListener('storage', cb);
+  return () => window.removeEventListener('storage', cb);
+}
+function readStorage() {
+  try {
+    return window.localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+function parseSaved(raw: string | null): SavedResult | null {
+  if (!raw) return null;
+  try {
+    const data = JSON.parse(raw) as SavedResult;
+    if (!data?.result || Date.now() - data.savedAt > STORAGE_TTL_MS) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+const STATUS_COLOR: Record<string, string> = {
+  Crítico: 'bg-[#c0563a]',
+  Atenção: 'bg-[#C97F38]',
+  Bom: 'bg-[#27594F]',
+  Excelente: 'bg-emerald-600',
+};
+
+/* ---------------- Número animado ---------------- */
+function CountUp({ to, reduce }: { to: number; reduce: boolean }) {
+  const [v, setV] = useState(reduce ? to : 0);
+  useEffect(() => {
+    if (reduce) return;
+    const c = animate(0, to, { duration: 1.4, ease: EASE, onUpdate: (x) => setV(Math.round(x)) });
+    return () => c.stop();
+  }, [to, reduce]);
+  return <>{reduce ? to : v}</>;
+}
+
+/* ---------------- Anel da nota ---------------- */
+function ScoreRing({ score, reduce, size = 150 }: { score: number; reduce: boolean; size?: number }) {
+  const R = 52;
+  const C = 2 * Math.PI * R;
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
+        <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="9" />
+        <motion.circle
+          cx="60"
+          cy="60"
+          r={R}
+          fill="none"
+          stroke="#C97F38"
+          strokeWidth="9"
+          strokeLinecap="round"
+          strokeDasharray={C}
+          initial={{ strokeDashoffset: C }}
+          animate={{ strokeDashoffset: C * (1 - score / 100) }}
+          transition={{ duration: reduce ? 0 : 1.4, ease: EASE }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="font-display text-5xl text-white">
+          <CountUp to={score} reduce={reduce} />
+        </span>
+        <span className="text-[11px] text-[#C1C0AC]">de 100</span>
+      </div>
+    </div>
+  );
+}
+
+export function DiagnosticWizard({ initialQ1 }: { initialQ1?: string } = {}) {
+  const reduce = !!useReducedMotion();
+
+  // Resposta da 1ª pergunta vinda da home (?q1=...): começa direto na pergunta 2
+  const prefilledQ1 = DIAGNOSTIC_QUESTIONS[0].options.some((o) => o.id === initialQ1)
+    ? initialQ1
+    : undefined;
+  const [phase, setPhase] = useState<WizardPhase>(prefilledQ1 ? 'questions' : 'intro');
+  const [currentIndex, setCurrentIndex] = useState(prefilledQ1 ? 1 : 0);
+  const [answers, setAnswers] = useState<Record<string, string>>(
+    prefilledQ1 ? { [DIAGNOSTIC_QUESTIONS[0].id]: prefilledQ1 } : {},
+  );
+
+  useEffect(() => {
+    if (!prefilledQ1) return;
+    trackRunaEvent('diagnostic_start', { total_questions: DIAGNOSTIC_QUESTIONS.length, source: 'home_teaser' });
+    trackRunaEvent('StartDiagnostic', {
+      total_questions: DIAGNOSTIC_QUESTIONS.length,
+      flow: 'gamified_quiz',
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Dados cadastrais do Lead
   const [name, setName] = useState('');
@@ -43,7 +155,8 @@ export function DiagnosticWizard() {
   const [segment, setSegment] = useState('');
   const [revenueRange, setRevenueRange] = useState('');
   const [website, setWebsite] = useState('');
-  const [privacyConsent, setPrivacyConsent] = useState(true);
+  // LGPD: consentimento precisa ser uma ação ativa da pessoa (começa desmarcado)
+  const [privacyConsent, setPrivacyConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [honeypot, setHoneypot] = useState('');
 
@@ -51,7 +164,11 @@ export function DiagnosticWizard() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [result, setResult] = useState<DiagnosticCalculationResult | null>(null);
-  const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
+  const [resultCompany, setResultCompany] = useState('');
+
+  // Resultado anterior salvo neste navegador
+  const savedRaw = useSyncExternalStore(subscribeStorage, readStorage, () => null);
+  const saved = useMemo(() => parseSaved(savedRaw), [savedRaw]);
 
   // Rastreamento de abandono por etapa
   const phaseRef = useRef<WizardPhase>(phase);
@@ -76,14 +193,37 @@ export function DiagnosticWizard() {
 
   const totalQuestions = DIAGNOSTIC_QUESTIONS.length;
   const currentQuestion = DIAGNOSTIC_QUESTIONS[currentIndex];
+  const answeredCount = Object.keys(answers).length;
   const progressPercent =
-    phase === 'intro'
-      ? 0
-      : phase === 'questions'
-      ? Math.round(((currentIndex + 1) / (totalQuestions + 1)) * 100)
-      : phase === 'lead_capture'
-      ? 92
-      : 100;
+    phase === 'questions'
+      ? Math.round((answeredCount / totalQuestions) * 100)
+      : phase === 'intro'
+        ? 0
+        : 100;
+
+  // Nota parcial por área enquanto a pessoa responde
+  const partialByCategory = useMemo(() => {
+    const buckets: Partial<Record<DiagnosticCategoryKey, number[]>> = {};
+    for (const q of DIAGNOSTIC_QUESTIONS) {
+      const opt = q.options.find((o) => o.id === answers[q.id]);
+      if (!opt) continue;
+      (buckets[q.category] ??= []).push(opt.score);
+    }
+    return CATEGORY_ORDER.map((cat) => {
+      const list = buckets[cat];
+      return {
+        cat,
+        label: DIAGNOSTIC_CATEGORY_LABELS[cat],
+        score: list ? Math.round(list.reduce((a, b) => a + b, 0) / list.length) : null,
+      };
+    });
+  }, [answers]);
+
+  // Prévia da nota antes do formulário (mesmo cálculo usado no servidor)
+  const preview = useMemo(
+    () => (answeredCount === totalQuestions ? calculateDiagnosticResult(answers) : null),
+    [answers, answeredCount, totalQuestions],
+  );
 
   const handleStart = () => {
     trackRunaEvent('diagnostic_start', { total_questions: totalQuestions });
@@ -93,6 +233,21 @@ export function DiagnosticWizard() {
     });
     setPhase('questions');
     setCurrentIndex(0);
+  };
+
+  const handleRestart = () => {
+    setAnswers({});
+    setResult(null);
+    setSubmitError(null);
+    setPhase('intro');
+    setCurrentIndex(0);
+  };
+
+  const showSaved = () => {
+    if (!saved) return;
+    setResult(saved.result);
+    setResultCompany(saved.company);
+    setPhase('result');
   };
 
   const handleSelectOption = (questionId: string, optionId: string) => {
@@ -107,11 +262,11 @@ export function DiagnosticWizard() {
     if (currentIndex < totalQuestions - 1) {
       setTimeout(() => {
         setCurrentIndex((prev) => prev + 1);
-      }, 180);
+      }, 220);
     } else {
       setTimeout(() => {
         setPhase('lead_capture');
-      }, 180);
+      }, 220);
     }
   };
 
@@ -154,20 +309,33 @@ export function DiagnosticWizard() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok || !data.success) {
+        // Erros de validação (400) trazem mensagens pensadas para o visitante;
+        // falhas internas nunca expõem detalhes técnicos.
         setSubmitError(
-          data.error ||
-            'Não foi possível salvar o diagnóstico no banco de dados Supabase. Verifique as credenciais em .env.local.'
+          response.status === 400 && data.error
+            ? data.error
+            : response.status === 429
+              ? 'Muitas tentativas em pouco tempo. Aguarde um minuto e tente de novo.'
+              : 'Não conseguimos salvar agora. Tente de novo em instantes ou fale com a gente no WhatsApp.',
         );
         setSubmitting(false);
         return;
       }
 
       setResult(data.result);
-      setSavedLeadId(data.leadId);
+      setResultCompany(company);
       setPhase('result');
+      try {
+        window.localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ result: data.result, company, savedAt: Date.now() } satisfies SavedResult),
+        );
+      } catch {
+        // navegador sem armazenamento: o resultado só não persiste
+      }
 
       // ID único para deduplicação perfeita entre Meta Pixel e Conversions API (CAPI)
       const leadEventId = data.leadEventId || `lead_${data.leadId}`;
@@ -193,40 +361,18 @@ export function DiagnosticWizard() {
         maturity_level: data.result.maturityLevel,
       });
     } catch {
-      setSubmitError(
-        'Falha de conexão ao salvar o diagnóstico. Tente novamente.'
-      );
+      setSubmitError('Falha de conexão. Verifique sua internet e tente de novo.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  return (
-    <div className="mx-auto max-w-4xl">
-      {/* Barra superior de progresso gamificado */}
-      {phase !== 'intro' && (
-        <div className="mb-6 rounded-2xl border border-[#d8d7cf] bg-[#fcfae5] p-4 shadow-sm">
-          <div className="flex items-center justify-between text-xs font-semibold text-[#27594F] mb-2">
-            <span>
-              {phase === 'questions'
-                ? `Etapa ${currentIndex + 1} de ${totalQuestions} · ${currentQuestion.categoryLabel}`
-                : phase === 'lead_capture'
-                ? 'Etapa Final · Geração do Relatório Executivo'
-                : 'Diagnóstico Concluído e Salvo'}
-            </span>
-            <span className="font-mono text-[#C97F38]">{progressPercent}%</span>
-          </div>
-          <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#E8E7DF]">
-            <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-[#27594F] to-[#C97F38]"
-              initial={{ width: 0 }}
-              animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 0.35 }}
-            />
-          </div>
-        </div>
-      )}
+  const inputCls =
+    'w-full rounded-xl border border-[#d8d7cf] bg-white px-4 py-3 text-sm text-[#1c1c10] transition-colors focus:border-[#27594F] focus:outline-none focus:ring-2 focus:ring-[#27594F]/15';
+  const labelCls = 'mb-1 block text-xs font-semibold text-[#1c1c10]';
 
+  return (
+    <div className="mx-auto max-w-5xl">
       <AnimatePresence mode="wait">
         {/* FASE 1: INTRO */}
         {phase === 'intro' && (
@@ -235,423 +381,445 @@ export function DiagnosticWizard() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
-            className="rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 sm:p-12 shadow-lg text-center space-y-6"
+            className="mx-auto max-w-3xl space-y-6 rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 text-center shadow-lg sm:p-12"
           >
             <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-[#27594F]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#27594F]">
               <Sparkles className="h-4 w-4 text-[#C97F38]" />
-              Avaliação Interativa em 8 Perguntas
+              Diagnóstico digital gratuito
             </div>
 
-            <h1 className="font-display text-3xl sm:text-5xl text-[#1c1c10] leading-tight">
-              Diagnóstico de Maturidade Digital e Crescimento Empresarial
+            <h1 className="font-display text-3xl leading-tight text-[#1c1c10] sm:text-5xl">
+              Descubra em 2 minutos onde sua empresa está perdendo clientes.
             </h1>
 
-            <p className="mx-auto max-w-2xl text-base sm:text-lg text-[#4c524b] leading-relaxed">
-              Avalie gratuitamente os 6 pilares digitais da sua empresa (Tráfego Pago, Sites, E-commerce, Automações e IA, Sistemas/CRM e Dados). Ao concluir, você recebe imediatamente sua pontuação detalhada, os principais gargalos e o plano de serviços recomendado.
+            <p className="mx-auto max-w-xl text-base leading-relaxed text-[#4c524b] sm:text-lg">
+              {totalQuestions} perguntas rápidas e você recebe uma nota de 0 a 100, os gargalos de cada área e o que priorizar primeiro.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left max-w-2xl mx-auto pt-2">
-              <div className="rounded-2xl border border-[#d8d7cf] bg-[#E8E7DF]/60 p-4">
-                <div className="text-xs font-bold text-[#C97F38]">01 · Rápido</div>
-                <p className="mt-1 text-xs text-[#1c1c10]">
-                  8 perguntas objetivas pensadas para empresários e gestores.
-                </p>
-              </div>
-              <div className="rounded-2xl border border-[#d8d7cf] bg-[#E8E7DF]/60 p-4">
-                <div className="text-xs font-bold text-[#27594F]">02 · Analítico</div>
-                <p className="mt-1 text-xs text-[#1c1c10]">
-                  Pontuação calculada geral e por categoria de 0 a 100 pontos.
-                </p>
-              </div>
-              <div className="rounded-2xl border border-[#d8d7cf] bg-[#E8E7DF]/60 p-4">
-                <div className="text-xs font-bold text-[#00616D]">03 · Imediato</div>
-                <p className="mt-1 text-xs text-[#1c1c10]">
-                  Resultado exibido na tela assim que as respostas são salvas.
-                </p>
-              </div>
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-medium text-[#1c1c10]/80">
+              <span className="flex items-center gap-1.5"><Clock className="h-4 w-4 text-[#27594F]" /> 2 minutos</span>
+              <span className="flex items-center gap-1.5"><LineChart className="h-4 w-4 text-[#27594F]" /> Nota na hora</span>
+              <span className="flex items-center gap-1.5"><Gift className="h-4 w-4 text-[#27594F]" /> 100% gratuito</span>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-2">
               <button
                 type="button"
                 onClick={handleStart}
-                className="inline-flex w-full sm:w-auto items-center justify-center gap-3 rounded-xl bg-[#C97F38] px-9 py-4 text-base font-semibold text-white shadow-lg transition-all hover:bg-[#b06b29] hover:-translate-y-0.5"
+                className="inline-flex w-full items-center justify-center gap-3 rounded-xl bg-[#C97F38] px-9 py-4 text-base font-semibold text-white shadow-lg shadow-[#C97F38]/30 transition-all hover:-translate-y-0.5 hover:bg-[#b06b29] sm:w-auto"
               >
-                Iniciar Diagnóstico Agora
+                Começar diagnóstico
                 <ArrowRight className="h-5 w-5" />
               </button>
             </div>
-          </motion.div>
-        )}
 
-        {/* FASE 2: 8 PERGUNTAS */}
-        {phase === 'questions' && currentQuestion && (
-          <motion.div
-            key={`question_${currentQuestion.id}`}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.25 }}
-            className="rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 sm:p-10 shadow-lg space-y-6"
-          >
-            <div className="flex items-center justify-between">
+            {saved && (
               <button
                 type="button"
-                onClick={handleBack}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#4c524b] hover:text-[#1c1c10]"
+                onClick={showSaved}
+                className="mx-auto flex items-center gap-2 text-sm font-semibold text-[#27594F] underline-offset-4 hover:underline"
               >
-                <ArrowLeft className="h-4 w-4" />
-                Voltar
+                <BarChart3 className="h-4 w-4" />
+                Ver o resultado de {saved.company} que você acabou de fazer
               </button>
-              <span className="rounded-full bg-[#27594F]/15 px-3 py-1 text-xs font-bold text-[#27594F]">
-                Pergunta {currentQuestion.number} de {totalQuestions}
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              <h2 className="font-display text-2xl sm:text-3xl text-[#1c1c10] leading-snug">
-                {currentQuestion.title}
-              </h2>
-              <p className="text-sm text-[#4c524b]">{currentQuestion.subtitle}</p>
-            </div>
-
-            <div className="space-y-3 pt-2">
-              {currentQuestion.options.map((option) => {
-                const isSelected = answers[currentQuestion.id] === option.id;
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={() => handleSelectOption(currentQuestion.id, option.id)}
-                    className={`w-full text-left rounded-2xl border p-4 sm:p-5 transition-all ${
-                      isSelected
-                        ? 'border-[#C97F38] bg-[#C97F38]/10 shadow-sm'
-                        : 'border-[#d8d7cf] bg-white hover:border-[#27594F] hover:bg-[#E8E7DF]/40'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="space-y-1">
-                        <div className="text-sm sm:text-base font-bold text-[#1c1c10]">
-                          {option.label}
-                        </div>
-                        <p className="text-xs sm:text-sm text-[#4c524b]">
-                          {option.description}
-                        </p>
-                      </div>
-                      <div
-                        className={`mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
-                          isSelected
-                            ? 'border-[#C97F38] bg-[#C97F38] text-white'
-                            : 'border-[#d8d7cf]'
-                        }`}
-                      >
-                        {isSelected && <CheckCircle2 className="h-4 w-4" />}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+            )}
           </motion.div>
         )}
 
-        {/* FASE 3: FORMULÁRIO DE CAPTURA E SALVAMENTO */}
-        {phase === 'lead_capture' && (
+        {/* FASE 2: PERGUNTAS + MAPA DA EMPRESA */}
+        {phase === 'questions' && currentQuestion && (
+          <motion.div
+            key="questions"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            className="grid grid-cols-1 gap-6 lg:grid-cols-12"
+          >
+            <div className="lg:col-span-8">
+              {/* Progresso */}
+              <div className="mb-4 flex items-center gap-3">
+                <span className="shrink-0 font-mono text-xs font-semibold text-[#27594F]">
+                  {answeredCount}/{totalQuestions}
+                </span>
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#d8d7cf]/60">
+                  <motion.div
+                    className="h-full rounded-full bg-gradient-to-r from-[#27594F] to-[#C97F38]"
+                    animate={{ width: `${progressPercent}%` }}
+                    transition={{ duration: 0.4, ease: EASE }}
+                  />
+                </div>
+              </div>
+
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentQuestion.id}
+                  initial={{ opacity: 0, x: 24 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -24 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-6 rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 shadow-lg sm:p-10"
+                >
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={handleBack}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#4c524b] hover:text-[#1c1c10]"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                      Voltar
+                    </button>
+                    <span className="rounded-full bg-[#27594F]/10 px-3 py-1 text-xs font-semibold text-[#27594F]">
+                      Pergunta {currentQuestion.number} de {totalQuestions} · {currentQuestion.categoryLabel}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h2 className="font-display text-2xl leading-snug text-[#1c1c10] sm:text-3xl">
+                      {currentQuestion.title}
+                    </h2>
+                    <p className="text-sm text-[#4c524b]">{currentQuestion.subtitle}</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    {currentQuestion.options.map((option) => {
+                      const isSelected = answers[currentQuestion.id] === option.id;
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => handleSelectOption(currentQuestion.id, option.id)}
+                          aria-pressed={isSelected}
+                          className={`w-full rounded-2xl border p-4 text-left transition-all sm:p-5 ${
+                            isSelected
+                              ? 'border-[#C97F38] bg-[#C97F38]/10 shadow-sm'
+                              : 'border-[#d8d7cf] bg-white hover:border-[#27594F] hover:bg-[#E8E7DF]/40'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="space-y-1">
+                              <div className="text-sm font-bold text-[#1c1c10] sm:text-base">{option.label}</div>
+                              <p className="text-xs text-[#4c524b] sm:text-sm">{option.description}</p>
+                            </div>
+                            <div
+                              className={`mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
+                                isSelected ? 'border-[#C97F38] bg-[#C97F38] text-white' : 'border-[#d8d7cf]'
+                              }`}
+                            >
+                              {isSelected && <CheckCircle2 className="h-4 w-4" />}
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Mapa da empresa: áreas se preenchendo conforme as respostas */}
+            <aside className="lg:col-span-4">
+              <div className="rounded-3xl border border-[#27594F] bg-runa-pattern-dark p-5 text-[#fcfae5] shadow-xl lg:sticky lg:top-28">
+                <p className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">Mapa da sua empresa</p>
+                <p className="mt-1 text-xs text-[#C1C0AC]">Cada resposta revela uma área.</p>
+                <ul className="mt-4 space-y-3">
+                  {partialByCategory.map((c) => {
+                    const isCurrent = c.cat === currentQuestion.category;
+                    return (
+                      <li key={c.cat}>
+                        <div className="mb-1 flex items-center justify-between text-[11px]">
+                          <span className={isCurrent ? 'font-semibold text-white' : 'text-[#C1C0AC]'}>{c.label}</span>
+                          <span className="font-mono text-[#C1C0AC]">{c.score === null ? '—' : '✓'}</span>
+                        </div>
+                        <div className={`h-1.5 overflow-hidden rounded-full ${isCurrent ? 'bg-[#C97F38]/25' : 'bg-white/10'}`}>
+                          <motion.div
+                            className="h-full rounded-full bg-[#C97F38]"
+                            initial={false}
+                            animate={{ width: c.score === null ? '0%' : `${Math.max(c.score, 8)}%` }}
+                            transition={{ duration: 0.6, ease: EASE }}
+                          />
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <p className="mt-4 hidden text-[11px] text-[#C1C0AC]/80 lg:block">A nota final aparece logo depois da última pergunta.</p>
+              </div>
+            </aside>
+          </motion.div>
+        )}
+
+        {/* FASE 3: PRÉVIA DA NOTA + FORMULÁRIO */}
+        {phase === 'lead_capture' && preview && (
           <motion.div
             key="lead_capture"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
-            className="rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 sm:p-10 shadow-lg space-y-6"
+            className="grid grid-cols-1 gap-6 lg:grid-cols-12"
           >
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                onClick={handleBack}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#4c524b] hover:text-[#1c1c10]"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Revisar última pergunta
-              </button>
-              <span className="rounded-full bg-[#C97F38]/15 px-3 py-1 text-xs font-bold text-[#C97F38]">
-                8/8 Perguntas Respondidas
-              </span>
+            {/* Prévia: nota visível, detalhes bloqueados */}
+            <div className="rounded-3xl border border-[#27594F] bg-runa-pattern-dark p-6 text-[#fcfae5] shadow-xl sm:p-8 lg:col-span-5">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">Sua nota está pronta</p>
+              <div className="mt-5 flex items-center gap-5">
+                <ScoreRing score={preview.overallScore} reduce={reduce} size={130} />
+                <div>
+                  <p className="text-xs text-[#C1C0AC]">Nível de maturidade</p>
+                  <p className="font-display text-2xl text-white">{preview.maturityLevel}</p>
+                </div>
+              </div>
+
+              <div className="relative mt-6 overflow-hidden rounded-2xl border border-white/10 bg-[#13302a]/80 p-4">
+                <div aria-hidden className="pointer-events-none select-none space-y-2.5 blur-[5px]">
+                  {preview.categoryDetails.map((c) => (
+                    <div key={c.category}>
+                      <div className="mb-1 flex justify-between text-[11px] text-[#C1C0AC]">
+                        <span>{c.label}</span>
+                        <span>{c.score}</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-white/10">
+                        <div className="h-full rounded-full bg-[#C97F38]" style={{ width: `${c.score}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                  <p className="pt-2 text-xs text-[#e9e8dc]">{preview.bottlenecks[0]?.description}</p>
+                </div>
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#13302a]/40 text-center">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#C97F38] text-white">
+                    <Lock className="h-5 w-5" />
+                  </span>
+                  <p className="px-6 text-sm font-semibold text-white">
+                    Nota por área, gargalos e plano de ação
+                  </p>
+                  <p className="text-xs text-[#C1C0AC]">
+                    Liberados ao preencher <span className="hidden lg:inline">ao lado</span>
+                    <span className="lg:hidden">abaixo</span>
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <h2 className="font-display text-2xl sm:text-3xl text-[#1c1c10]">
-                Suas respostas estão prontas para processamento!
-              </h2>
-              <p className="text-sm text-[#4c524b]">
-                Informe os dados da sua empresa abaixo para salvar o diagnóstico e exibir imediatamente sua pontuação geral, análise por categoria e recomendações.
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmitDiagnostic} className="space-y-4">
-              {/* Honeypot anti-spam */}
-              <div className="hidden" aria-hidden="true">
-                <input
-                  type="text"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  value={honeypot}
-                  onChange={(e) => setHoneypot(e.target.value)}
-                />
+            {/* Formulário enxuto */}
+            <div className="space-y-5 rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 shadow-lg sm:p-8 lg:col-span-7">
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#4c524b] hover:text-[#1c1c10]"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Revisar respostas
+                </button>
+                <span className="rounded-full bg-[#C97F38]/15 px-3 py-1 text-xs font-semibold text-[#b06b29]">
+                  {totalQuestions}/{totalQuestions} respondidas
+                </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1c1c10] mb-1">
-                    Seu Nome *
-                  </label>
+              <div>
+                <h2 className="font-display text-2xl text-[#1c1c10] sm:text-3xl">Receba seu relatório completo</h2>
+                <p className="mt-1 text-sm text-[#4c524b]">
+                  Leva 30 segundos. O relatório aparece na tela assim que você enviar.
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmitDiagnostic} className="space-y-4">
+                {/* Honeypot anti-spam */}
+                <div className="hidden" aria-hidden="true">
                   <input
                     type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Seu nome completo"
-                    className="w-full rounded-xl border border-[#d8d7cf] bg-white px-4 py-3 text-sm text-[#1c1c10] focus:border-[#27594F] focus:outline-none"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1c1c10] mb-1">
-                    E-mail Corporativo *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="voce@suaempresa.com.br"
-                    className="w-full rounded-xl border border-[#d8d7cf] bg-white px-4 py-3 text-sm text-[#1c1c10] focus:border-[#27594F] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1c1c10] mb-1">
-                    WhatsApp com DDD *
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={whatsapp}
-                    onChange={(e) => setWhatsapp(e.target.value)}
-                    placeholder="(45) 99999-9999"
-                    className="w-full rounded-xl border border-[#d8d7cf] bg-white px-4 py-3 text-sm text-[#1c1c10] focus:border-[#27594F] focus:outline-none"
-                  />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="dg-name" className={labelCls}>Seu nome</label>
+                    <input id="dg-name" type="text" required autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Como podemos te chamar?" className={inputCls} />
+                  </div>
+                  <div>
+                    <label htmlFor="dg-company" className={labelCls}>Empresa</label>
+                    <input id="dg-company" type="text" required autoComplete="organization" value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Nome da sua empresa" className={inputCls} />
+                  </div>
+                  <div>
+                    <label htmlFor="dg-whatsapp" className={labelCls}>WhatsApp com DDD</label>
+                    <input id="dg-whatsapp" type="tel" required autoComplete="tel" inputMode="tel" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="(45) 99999-9999" className={inputCls} />
+                  </div>
+                  <div>
+                    <label htmlFor="dg-email" className={labelCls}>E-mail</label>
+                    <input id="dg-email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="voce@email.com" className={inputCls} />
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1c1c10] mb-1">
-                    Nome da Empresa *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    placeholder="Nome da sua empresa"
-                    className="w-full rounded-xl border border-[#d8d7cf] bg-white px-4 py-3 text-sm text-[#1c1c10] focus:border-[#27594F] focus:outline-none"
-                  />
-                </div>
-              </div>
+                <details className="group rounded-2xl border border-[#d8d7cf] bg-white/60 px-4 py-3">
+                  <summary className="cursor-pointer list-none text-xs font-semibold text-[#27594F] [&::-webkit-details-marker]:hidden">
+                    <span className="inline-flex items-center gap-1.5">
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-open:rotate-90" />
+                      Mais detalhes (opcional): ajudam a deixar a análise mais precisa
+                    </span>
+                  </summary>
+                  <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div>
+                      <label htmlFor="dg-segment" className={labelCls}>Segmento</label>
+                      <select id="dg-segment" value={segment} onChange={(e) => setSegment(e.target.value)} className={inputCls}>
+                        <option value="">Selecione...</option>
+                        {BUSINESS_SEGMENTS.map((seg) => (
+                          <option key={seg} value={seg}>{seg}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor="dg-revenue" className={labelCls}>Faturamento mensal</label>
+                      <select id="dg-revenue" value={revenueRange} onChange={(e) => setRevenueRange(e.target.value)} className={inputCls}>
+                        <option value="">Selecione...</option>
+                        {REVENUE_RANGES.map((rev) => (
+                          <option key={rev} value={rev}>{rev}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor="dg-site" className={labelCls}>Site ou Instagram</label>
+                      <input id="dg-site" type="text" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="suaempresa.com.br" className={inputCls} />
+                    </div>
+                  </div>
+                </details>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1c1c10] mb-1">
-                    Segmento *
+                {/* Consentimento LGPD: começa desmarcado */}
+                <div className="space-y-2.5 rounded-2xl border border-[#d8d7cf] bg-[#E8E7DF]/50 p-4 text-xs text-[#4c524b]">
+                  <label className="flex cursor-pointer items-start gap-2.5">
+                    <input
+                      type="checkbox"
+                      required
+                      checked={privacyConsent}
+                      onChange={(e) => setPrivacyConsent(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 accent-[#27594F]"
+                    />
+                    <span>
+                      Concordo que a RUNA guarde minhas respostas e contato para me enviar a análise, conforme a{' '}
+                      <Link href="/politica-de-privacidade" className="font-semibold text-[#27594F] underline">
+                        Política de Privacidade
+                      </Link>
+                      .
+                    </span>
                   </label>
-                  <select
-                    required
-                    value={segment}
-                    onChange={(e) => setSegment(e.target.value)}
-                    className="w-full rounded-xl border border-[#d8d7cf] bg-white px-4 py-3 text-sm text-[#1c1c10] focus:border-[#27594F] focus:outline-none"
-                  >
-                    <option value="">Selecione...</option>
-                    {BUSINESS_SEGMENTS.map((seg) => (
-                      <option key={seg} value={seg}>
-                        {seg}
-                      </option>
-                    ))}
-                  </select>
+                  <label className="flex cursor-pointer items-start gap-2.5">
+                    <input
+                      type="checkbox"
+                      checked={marketingConsent}
+                      onChange={(e) => setMarketingConsent(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 accent-[#C97F38]"
+                    />
+                    <span>Quero receber conteúdos sobre marketing, tecnologia e IA (opcional).</span>
+                  </label>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1c1c10] mb-1">
-                    Faixa de Faturamento
-                  </label>
-                  <select
-                    value={revenueRange}
-                    onChange={(e) => setRevenueRange(e.target.value)}
-                    className="w-full rounded-xl border border-[#d8d7cf] bg-white px-4 py-3 text-sm text-[#1c1c10] focus:border-[#27594F] focus:outline-none"
-                  >
-                    <option value="">Opcional...</option>
-                    {REVENUE_RANGES.map((rev) => (
-                      <option key={rev} value={rev}>
-                        {rev}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-[#1c1c10] mb-1">
-                    Site ou Instagram (Opcional)
-                  </label>
-                  <input
-                    type="text"
-                    value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
-                    placeholder="suaempresa.com.br"
-                    className="w-full rounded-xl border border-[#d8d7cf] bg-white px-4 py-3 text-sm text-[#1c1c10] focus:border-[#27594F] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Consentimento LGPD */}
-              <div className="space-y-2 rounded-2xl border border-[#d8d7cf] bg-[#E8E7DF]/50 p-4 text-xs text-[#4c524b]">
-                <label className="flex items-start gap-2.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    required
-                    checked={privacyConsent}
-                    onChange={(e) => setPrivacyConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 accent-[#27594F]"
-                  />
-                  <span>
-                    Autorizo o armazenamento das respostas do diagnóstico e dados de contato para análise consultiva da RUNA conforme a{' '}
-                    <Link
-                      href="/politica-de-privacidade"
-                      className="text-[#27594F] font-semibold underline"
+                {submitError && (
+                  <div className="flex flex-col gap-3 rounded-xl border border-[#c0563a]/30 bg-[#c0563a]/10 p-4 text-sm text-[#7a2e1c] sm:flex-row sm:items-center sm:justify-between">
+                    <span className="flex items-start gap-2">
+                      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                      {submitError}
+                    </span>
+                    <a
+                      href={buildRunaWhatsAppUrl(
+                        `Olá! Tentei concluir o diagnóstico no site da RUNA e não consegui enviar. Minha nota prévia foi ${preview.overallScore}/100.`,
+                      )}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackRunaEvent('whatsapp_click', { placement: 'diagnostic_submit_error' })}
+                      className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#27594F] underline-offset-4 hover:underline"
                     >
-                      Política de Privacidade (LGPD)
-                    </Link>
-                    . *
-                  </span>
-                </label>
-
-                <label className="flex items-start gap-2.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={marketingConsent}
-                    onChange={(e) => setMarketingConsent(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 accent-[#C97F38]"
-                  />
-                  <span>
-                    (Opcional) Desejo receber conteúdos estratégicos e materiais sobre marketing, tecnologia e IA.
-                  </span>
-                </label>
-              </div>
-
-              {submitError && (
-                <div className="flex items-start gap-2.5 rounded-xl border border-red-300 bg-red-50 p-4 text-xs text-red-800">
-                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-600" />
-                  <span>{submitError}</span>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#C97F38] px-7 py-4 text-base font-semibold text-white shadow-lg transition-all hover:bg-[#b06b29] disabled:opacity-60"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Salvando diagnóstico e calculando resultado...
-                  </>
-                ) : (
-                  <>
-                    <Trophy className="h-5 w-5" />
-                    Salvar e Ver Meu Resultado Agora
-                  </>
+                      <MessageCircle className="h-4 w-4" /> Falar no WhatsApp
+                    </a>
+                  </div>
                 )}
-              </button>
-            </form>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#C97F38] px-7 py-4 text-base font-semibold text-white shadow-lg shadow-[#C97F38]/30 transition-all hover:bg-[#b06b29] disabled:opacity-60"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Preparando seu relatório...
+                    </>
+                  ) : (
+                    <>
+                      Ver meu relatório completo
+                      <ArrowRight className="h-5 w-5" />
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
           </motion.div>
         )}
 
-        {/* FASE 4: RESULTADO IMEDIATO APÓS SALVAMENTO */}
+        {/* FASE 4: RELATÓRIO */}
         {phase === 'result' && result && (
           <motion.div
             key="result"
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="space-y-8"
+            className="space-y-6"
           >
-            {/* Card Principal de Score */}
-            <div className="bg-runa-pattern-dark rounded-3xl border border-[#27594F] p-6 sm:p-10 text-white shadow-2xl">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/15 pb-4 mb-6">
-                <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#C97F38]">
+            {/* Nota geral */}
+            <div className="rounded-3xl border border-[#27594F] bg-runa-pattern-dark p-6 text-white shadow-2xl sm:p-10">
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-2 border-b border-white/15 pb-4">
+                <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#C97F38]">
                   <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                  Diagnóstico Registrado para {company}
-                </div>
-                {savedLeadId && (
-                  <span className="text-[11px] font-mono text-[#C1C0AC]">
-                    Protocolo CRM #{savedLeadId.slice(0, 8)}
-                  </span>
-                )}
+                  Relatório de {resultCompany || 'sua empresa'}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleRestart}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C1C0AC] hover:text-white"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" /> Refazer diagnóstico
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                <div className="lg:col-span-4 flex flex-col items-center justify-center rounded-2xl border border-white/15 bg-[#13302a]/90 p-6 text-center">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[#C1C0AC]">
-                    Pontuação Geral
-                  </span>
-                  <div className="my-2 font-display text-6xl text-[#C97F38]">
-                    {result.overallScore}
-                    <span className="text-2xl text-white/60">/100</span>
-                  </div>
+              <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
+                <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/15 bg-[#13302a]/90 p-6 text-center lg:col-span-4">
+                  <ScoreRing score={result.overallScore} reduce={reduce} />
                   <span className="inline-block rounded-full bg-white/10 px-4 py-1 text-xs font-bold text-white">
-                    Nível: {result.maturityLevel}
+                    {result.maturityLevel}
                   </span>
                 </div>
 
-                <div className="lg:col-span-8 space-y-4">
-                  <h2 className="font-display text-2xl sm:text-3xl text-white">
-                    Análise Executiva do Seu Cenário Digital
-                  </h2>
-                  <p className="text-sm sm:text-base text-[#E8E7DF]/90 leading-relaxed">
-                    {result.maturityDescription}
-                  </p>
+                <div className="space-y-4 lg:col-span-8">
+                  <h2 className="font-display text-2xl text-white sm:text-3xl">O que sua nota diz</h2>
+                  <p className="text-sm leading-relaxed text-[#E8E7DF]/90 sm:text-base">{result.maturityDescription}</p>
                   <div className="rounded-xl border border-[#C97F38]/40 bg-[#C97F38]/15 p-4">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#C97F38] block">
-                      Frente Prioritária Recomendada:
-                    </span>
-                    <span className="text-lg font-bold text-white">
-                      {result.primaryRecommendation}
-                    </span>
+                    <span className="block text-xs font-bold uppercase tracking-wider text-[#C97F38]">Comece por aqui</span>
+                    <span className="text-lg font-bold text-white">{result.primaryRecommendation}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Pontuação por Categoria (6 Pilares) */}
-            <div className="rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 sm:p-8 shadow-sm">
-              <div className="flex items-center gap-2 mb-6">
+            {/* Nota por área */}
+            <div className="rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 shadow-sm sm:p-8">
+              <div className="mb-6 flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-[#27594F]" />
-                <h3 className="font-display text-2xl text-[#1c1c10]">
-                  Pontuação por Categoria
-                </h3>
+                <h3 className="font-display text-2xl text-[#1c1c10]">Nota por área</h3>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                {result.categoryDetails.map((cat) => (
-                  <div
-                    key={cat.category}
-                    className="rounded-2xl border border-[#d8d7cf] bg-white p-4 space-y-2"
-                  >
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                {result.categoryDetails.map((cat, i) => (
+                  <div key={cat.category} className="space-y-2 rounded-2xl border border-[#d8d7cf] bg-white p-4">
                     <div className="flex items-center justify-between text-xs font-bold">
                       <span className="text-[#1c1c10]">{cat.label}</span>
-                      <span className="text-[#27594F]">{cat.score}/100 ({cat.status})</span>
+                      <span className="text-[#27594F]">
+                        {cat.score}/100 · {cat.status}
+                      </span>
                     </div>
                     <div className="h-2 w-full overflow-hidden rounded-full bg-[#E8E7DF]">
-                      <div
-                        className="h-full rounded-full bg-[#27594F]"
-                        style={{ width: `${cat.score}%` }}
+                      <motion.div
+                        className={`h-full rounded-full ${STATUS_COLOR[cat.status] ?? 'bg-[#27594F]'}`}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${cat.score}%` }}
+                        transition={{ duration: reduce ? 0 : 1, delay: reduce ? 0 : 0.2 + i * 0.08, ease: EASE }}
                       />
                     </div>
                   </div>
@@ -659,68 +827,48 @@ export function DiagnosticWizard() {
               </div>
             </div>
 
-            {/* Principais Gargalos Identificados */}
-            <div className="rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 sm:p-8 shadow-sm">
-              <div className="flex items-center gap-2 mb-5">
-                <AlertTriangle className="h-5 w-5 text-[#C97F38]" />
-                <h3 className="font-display text-2xl text-[#1c1c10]">
-                  Principais Gargalos Identificados
-                </h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {result.bottlenecks.map((b, index) => (
-                  <div
-                    key={`${b.category}_${index}`}
-                    className="rounded-2xl border border-amber-500/30 bg-amber-50/60 p-4 space-y-1.5"
-                  >
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-[#9a5c20]">{b.categoryLabel}</span>
-                      <span className="rounded bg-amber-500/20 px-2 py-0.5 text-[11px] text-amber-900">
-                        Criticidade {b.severity}
-                      </span>
+            {/* Gargalos */}
+            {result.bottlenecks.length > 0 && (
+              <div className="rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 shadow-sm sm:p-8">
+                <div className="mb-5 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-[#C97F38]" />
+                  <h3 className="font-display text-2xl text-[#1c1c10]">Onde sua empresa está perdendo oportunidades</h3>
+                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {result.bottlenecks.map((b, index) => (
+                    <div key={`${b.category}_${index}`} className="space-y-1.5 rounded-2xl border border-[#C97F38]/30 bg-[#C97F38]/[0.06] p-4">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-[#9a5c20]">{b.categoryLabel}</span>
+                        <span className="rounded bg-[#C97F38]/20 px-2 py-0.5 text-[11px] text-[#7a4615]">
+                          Impacto {b.severity === 'Alta' ? 'alto' : 'médio'}
+                        </span>
+                      </div>
+                      <p className="text-xs leading-relaxed text-[#1c1c10] sm:text-sm">{b.description}</p>
                     </div>
-                    <p className="text-xs sm:text-sm text-[#1c1c10] leading-relaxed">
-                      {b.description}
-                    </p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Soluções Recomendadas */}
-            <div className="rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 sm:p-8 shadow-sm space-y-6">
+            {/* Plano de ação */}
+            <div className="space-y-6 rounded-3xl border border-[#d8d7cf] bg-[#fcfae5] p-6 shadow-sm sm:p-8">
               <div>
-                <span className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">
-                  — Plano de Ação Recomendado
-                </span>
-                <h3 className="font-display text-2xl text-[#1c1c10] mt-1">
-                  Serviços Relacionados para Destravar Seu Crescimento
-                </h3>
+                <span className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">— Plano de ação</span>
+                <h3 className="mt-1 font-display text-2xl text-[#1c1c10]">O que priorizar na sua empresa</h3>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
                 {result.recommendedServices.map((rec) => (
-                  <div
-                    key={rec.slug}
-                    className="flex flex-col justify-between rounded-2xl border border-[#d8d7cf] bg-white p-5"
-                  >
+                  <div key={rec.slug} className="flex flex-col justify-between rounded-2xl border border-[#d8d7cf] bg-white p-5">
                     <div className="space-y-2">
                       <span className="inline-block rounded-full bg-[#27594F]/15 px-3 py-0.5 text-[11px] font-bold text-[#27594F]">
                         {rec.priority}
                       </span>
-                      <h4 className="font-display text-xl text-[#1c1c10]">
-                        {rec.title}
-                      </h4>
-                      <p className="text-xs text-[#4c524b] leading-relaxed">
-                        {rec.reason}
-                      </p>
+                      <h4 className="font-display text-xl text-[#1c1c10]">{rec.title}</h4>
+                      <p className="text-xs leading-relaxed text-[#4c524b]">{rec.reason}</p>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-[#d8d7cf]">
-                      <Link
-                        href={`/solucoes/${rec.slug}`}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-[#C97F38] hover:underline"
-                      >
+                    <div className="mt-4 border-t border-[#d8d7cf] pt-3">
+                      <Link href={`/solucoes/${rec.slug}`} className="inline-flex items-center gap-1 text-xs font-bold text-[#C97F38] hover:underline">
                         Conhecer esta solução →
                       </Link>
                     </div>
@@ -728,19 +876,16 @@ export function DiagnosticWizard() {
                 ))}
               </div>
 
-              {/* CTA Conversa no WhatsApp com o diagnóstico pronto */}
-              <div className="rounded-2xl bg-[#1e4840] p-6 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex flex-col items-center justify-between gap-4 rounded-2xl bg-[#1e4840] p-6 text-white sm:flex-row">
                 <div className="space-y-1">
-                  <h4 className="text-base font-bold">
-                    Quer debater seu resultado ({result.overallScore}/100) com um especialista da RUNA?
-                  </h4>
+                  <h4 className="text-base font-bold">Quer conversar sobre sua nota ({result.overallScore}/100)?</h4>
                   <p className="text-xs text-[#E8E7DF]/80">
-                    Suas respostas já estão salvas em nosso CRM interno. Clique ao lado para iniciar a conversa no WhatsApp.
+                    A gente analisa seu resultado com você e mostra por onde começar, sem compromisso.
                   </p>
                 </div>
                 <a
                   href={buildRunaWhatsAppUrl(
-                    `Olá! Acabei de concluir o Diagnóstico Digital da RUNA para a empresa ${company}. Minha pontuação foi ${result.overallScore}/100 (${result.maturityLevel}) e a recomendação principal foi ${result.primaryRecommendation}. Gostaria de conversar sobre os próximos passos!`
+                    `Olá! Acabei de concluir o Diagnóstico Digital da RUNA para a empresa ${resultCompany}. Minha pontuação foi ${result.overallScore}/100 (${result.maturityLevel}) e a recomendação principal foi ${result.primaryRecommendation}. Gostaria de conversar sobre os próximos passos!`
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -750,10 +895,10 @@ export function DiagnosticWizard() {
                       overall_score: result.overallScore,
                     })
                   }
-                  className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 text-sm font-semibold text-white shadow-lg hover:bg-[#1ebe5a]"
+                  className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#C97F38] px-6 py-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-[#b06b29]"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  Falar no WhatsApp sobre meu diagnóstico
+                  Conversar no WhatsApp
                 </a>
               </div>
             </div>

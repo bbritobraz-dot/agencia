@@ -352,3 +352,13 @@ export const RUNA_SERVICES: ServiceCategory[] = [
 export function getServiceBySlug(slug: string): ServiceCategory | undefined {
   return RUNA_SERVICES.find((service) => service.slug === slug);
 }
+
+/** Frase de "dor" de cada solução: o problema que o cliente reconhece (por id) */
+export const SERVICE_HOOKS: Record<string, string> = {
+  'trafego-pago': 'Depende de indicação para vender?',
+  'sites-landing-pages': 'Seu site não gera contatos?',
+  ecommerce: 'Visitas que não viram pedidos?',
+  'automacoes-ia': 'Leads esperando horas por resposta?',
+  'sistemas-sob-medida': 'Vendas controladas em planilhas?',
+  'dados-analytics': 'Não sabe qual anúncio dá retorno?',
+};

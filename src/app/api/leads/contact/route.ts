@@ -72,10 +72,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const matchedService =
-      RUNA_SERVICES.find(
-        (s) => s.slug === serviceInterest || s.title === serviceInterest
-      ) || RUNA_SERVICES[0];
+    // "Ainda não sei" (ou valor desconhecido) não deve virar lead de uma solução específica
+    const foundService = RUNA_SERVICES.find(
+      (s) => s.slug === serviceInterest || s.title === serviceInterest
+    );
+    const matchedService = foundService
+      ? { slug: foundService.slug, title: foundService.title }
+      : { slug: 'a-definir', title: 'A definir (pediu orientação)' };
 
     const utms = body.utms || {};
     const utmSource = sanitizeText(utms.utm_source, 100) || null;
@@ -124,10 +127,10 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (leadError || !leadRecord) {
+      // Detalhe técnico só nos logs do servidor; o visitante recebe mensagem genérica
+      console.error('[contact] falha ao inserir lead:', leadError?.message || 'sem registro retornado');
       return NextResponse.json(
-        {
-          error: `Erro ao registrar contato no Supabase: ${leadError?.message || 'Falha desconhecida'}`,
-        },
+        { error: 'Não conseguimos registrar sua mensagem agora. Tente novamente em instantes.' },
         { status: 500 }
       );
     }
@@ -159,8 +162,10 @@ export async function POST(request: NextRequest) {
       leadId: leadRecord.id,
     });
   } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : 'Erro interno ao enviar formulário comercial.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('[contact] erro inesperado:', err instanceof Error ? err.message : err);
+    return NextResponse.json(
+      { error: 'Não conseguimos registrar sua mensagem agora. Tente novamente em instantes.' },
+      { status: 500 }
+    );
   }
 }
