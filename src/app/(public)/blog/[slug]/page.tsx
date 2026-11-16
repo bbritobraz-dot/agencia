@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/seo';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -33,7 +34,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-const SITE_DOMAIN = 'https://airuna.com.br';
+const SITE_DOMAIN = SITE_URL;
 
 export async function generateStaticParams() {
   return RUNA_BLOG_POSTS.map((post) => ({
@@ -52,9 +53,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const canonicalUrl = `${SITE_DOMAIN}/blog/${post.slug}`;
+  // Versão JPG leve (1200x675) da capa para prévias de link (WhatsApp ignora imagens pesadas)
+  const coverOg = post.cover.png.replace(/\.png$/, '-og.jpg');
 
   return {
-    title: `${post.seoTitle} | RUNA`,
+    title: post.seoTitle,
     description: post.metaDescription,
     authors: [{ name: post.author }],
     keywords: post.tags,
@@ -73,9 +76,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       tags: post.tags,
       images: [
         {
-          url: `${SITE_DOMAIN}${post.cover.webp}`,
-          width: post.cover.width,
-          height: post.cover.height,
+          url: `${SITE_DOMAIN}${coverOg}`,
+          width: 1200,
+          height: 675,
           alt: post.cover.alt,
         },
       ],
@@ -84,7 +87,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: post.seoTitle,
       description: post.metaDescription,
-      images: [`${SITE_DOMAIN}${post.cover.webp}`],
+      images: [`${SITE_DOMAIN}${coverOg}`],
     },
   };
 }
@@ -115,6 +118,8 @@ export default async function BlogArticlePage({ params }: PageProps) {
   }
 
   const canonicalUrl = `${SITE_DOMAIN}/blog/${post.slug}`;
+  // Versão JPG leve (1200x675) da capa para prévias de link (WhatsApp ignora imagens pesadas)
+  const coverOg = post.cover.png.replace(/\.png$/, '-og.jpg');
   const relatedServices = RUNA_SERVICES.filter((service) =>
     post.relatedServiceSlugs.includes(service.slug)
   );
@@ -132,7 +137,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
     image: [
       `${SITE_DOMAIN}${post.cover.avif}`,
       `${SITE_DOMAIN}${post.cover.webp}`,
-      `${SITE_DOMAIN}${post.cover.png}`,
+      `${SITE_DOMAIN}${coverOg}`,
     ],
     author: {
       '@type': 'Person',

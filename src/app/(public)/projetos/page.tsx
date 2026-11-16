@@ -1,14 +1,17 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import { ShieldCheck } from 'lucide-react';
 import { AUTHORIZED_PORTFOLIO, type PortfolioType } from '@/config/projects';
 import { ProjectsGallery } from '@/components/public/ProjectsGallery';
 import { ServiceCtas } from '@/components/public/ServicePageParts';
 
-export const metadata: Metadata = {
-  title: 'Projetos: Sites, Lojas Virtuais e Landing Pages',
+export const metadata: Metadata = pageMetadata({
+  title: 'Projetos: sites, lojas e sistemas',
   description:
-    'Veja sites institucionais, lojas virtuais, landing pages e sistemas desenvolvidos pela RUNA para empresas de diferentes segmentos.',
-};
+    'Veja sites, lojas virtuais, landing pages e sistemas que a RUNA criou para empresas de diferentes segmentos, com links para os projetos no ar.',
+  path: '/projetos',
+  image: '/og/projetos.jpg',
+});
 
 const TYPE_ORDER: PortfolioType[] = ['site', 'ecommerce', 'landing', 'sistema'];
 const TYPE_PLURAL: Record<PortfolioType, string> = {

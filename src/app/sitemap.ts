@@ -1,9 +1,10 @@
 import type { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/seo';
 import { RUNA_SERVICES } from '@/config/services';
 import { RUNA_BLOG_POSTS } from '@/config/blog';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://airuna.com.br';
+  const baseUrl = SITE_URL;
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Image from 'next/image';
 import {
   Building2,
@@ -14,11 +15,13 @@ import { AUTHORIZED_PORTFOLIO } from '@/config/projects';
 import { RUNA_SERVICES } from '@/config/services';
 import { ServiceCtas } from '@/components/public/ServicePageParts';
 
-export const metadata: Metadata = {
-  title: 'Sobre a RUNA — Marketing, Tecnologia e Automação',
+export const metadata: Metadata = pageMetadata({
+  title: 'Quem somos',
   description:
     'Conheça a RUNA e o Bruno, fundador: da engenharia e da gestão de um restaurante ao marketing orientado a dados para empresas que querem crescer.',
-};
+  path: '/sobre',
+  image: '/og/sobre.jpg',
+});
 
 const LOGO = (n: number) => `/LOGOS/Logotipo_Runa%20Oficial%20(${n}).webp`;
 

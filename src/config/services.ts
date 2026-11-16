@@ -72,7 +72,7 @@ export const RUNA_SERVICES: ServiceCategory[] = [
     ],
     ctaLabel: 'Solicitar diagnóstico de mídia paga',
     seo: {
-      title: 'Gestão de Tráfego Pago (Google Ads e Meta Ads)',
+      title: 'Gestão de tráfego pago: Google Ads e Meta Ads',
       description:
         'Gestão estratégica de Google Ads, Meta Ads, remarketing e geração de leads com foco em eficiência comercial e dados.',
     },
@@ -126,7 +126,7 @@ export const RUNA_SERVICES: ServiceCategory[] = [
     ],
     ctaLabel: 'Avaliar estrutura do meu site',
     seo: {
-      title: 'Criação de Sites Institucionais e Landing Pages de Alta Conversão',
+      title: 'Criação de sites e landing pages que convertem',
       description:
         'Desenvolvimento de sites institucionais, páginas de vendas e landing pages com SEO técnico, alta velocidade e integrações.',
     },
@@ -180,7 +180,7 @@ export const RUNA_SERVICES: ServiceCategory[] = [
     ],
     ctaLabel: 'Diagnosticar minha operação de e-commerce',
     seo: {
-      title: 'Desenvolvimento e Otimização de E-commerce (Shopify e WooCommerce)',
+      title: 'Loja virtual em Shopify e WooCommerce',
       description:
         'Criação e evolução de lojas virtuais em Shopify e WooCommerce com foco em conversão, integrações de pagamento e mensuração.',
     },
@@ -234,7 +234,7 @@ export const RUNA_SERVICES: ServiceCategory[] = [
     ],
     ctaLabel: 'Mapear automações para minha empresa',
     seo: {
-      title: 'Automações de Processos, n8n e Agentes de Inteligência Artificial',
+      title: 'Automações e agentes de IA para empresas',
       description:
         'Automatize o atendimento, integre sistemas com n8n e implemente agentes inteligentes de IA para escalar a operação da sua empresa.',
     },
@@ -288,7 +288,7 @@ export const RUNA_SERVICES: ServiceCategory[] = [
     ],
     ctaLabel: 'Projetar sistema sob medida',
     seo: {
-      title: 'Desenvolvimento de Sistemas Web Sob Medida, CRM e Portais',
+      title: 'Sistemas sob medida, CRM e portais',
       description:
         'Criamos sistemas sob medida, CRMs próprios, dashboards, portais de clientes e ferramentas internas com arquitetura moderna e segura.',
     },
@@ -342,7 +342,7 @@ export const RUNA_SERVICES: ServiceCategory[] = [
     ],
     ctaLabel: 'Auditar minha estrutura de dados',
     seo: {
-      title: 'Dados, Web Analytics, GA4, GTM e API de Conversões',
+      title: 'Dados e analytics: GA4, GTM e API de Conversões',
       description:
         'Estruturação completa de GA4, Google Tag Manager, Pixel, API de Conversões, dashboards executivos e inteligência de funil.',
     },

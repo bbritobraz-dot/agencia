@@ -1,17 +1,17 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { RUNA_BLOG_POSTS } from '@/config/blog';
 import { BlogListClient } from '@/components/blog/BlogListClient';
 import { BookOpen, Sparkles, ArrowRight } from 'lucide-react';
 
-export const metadata: Metadata = {
-  title: 'Blog & Inteligência Digital | RUNA',
+export const metadata: Metadata = pageMetadata({
+  title: 'Blog: Google, Meta e IA para empresas',
   description:
-    'Artigos, análises estratégicas e guias práticos sobre Google Ads, Inteligência Artificial, SEO, Sites de Alta Conversão e Automação Comercial.',
-  alternates: {
-    canonical: 'https://airuna.com.br/blog',
-  },
-};
+    'Análises e guias práticos sobre Google Ads, Meta Ads, inteligência artificial, SEO e sites que convertem, explicados para quem decide.',
+  path: '/blog',
+  image: '/og/blog.jpg',
+});
 
 export default function BlogIndexPage() {
   const publishedPosts = RUNA_BLOG_POSTS.filter((p) => p.status === 'published');

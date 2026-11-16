@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import { DiagnosticWizard } from '@/components/diagnostic/DiagnosticWizard';
 
-export const metadata: Metadata = {
-  title: 'Diagnóstico Digital Gratuito — Avalie a Maturidade da Sua Empresa',
+export const metadata: Metadata = pageMetadata({
+  title: 'Diagnóstico digital gratuito em 2 minutos',
   description:
-    'Responda 8 perguntas estratégicas e descubra gratuitamente o índice de maturidade digital da sua empresa, principais gargalos e soluções recomendadas.',
-};
+    'Responda 8 perguntas e receba na hora a nota de maturidade digital da sua empresa, os principais gargalos e o que priorizar primeiro.',
+  path: '/diagnostico',
+  image: '/og/diagnostico.jpg',
+});
 
 export default async function DiagnosticoPage({
   searchParams,

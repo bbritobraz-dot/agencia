@@ -1,15 +1,18 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { ArrowRight, Compass } from 'lucide-react';
 import { RUNA_SERVICES, SERVICE_HOOKS } from '@/config/services';
 import { ServiceIcon } from '@/components/public/ServiceIcon';
 import { ServiceDemo } from '@/components/public/ServicePageParts';
 
-export const metadata: Metadata = {
-  title: 'Soluções em Marketing, Tecnologia, IA e Sistemas Sob Medida',
+export const metadata: Metadata = pageMetadata({
+  title: 'Soluções em marketing, tecnologia e IA',
   description:
-    'Conheça as 6 frentes de atuação da RUNA: Gestão de Tráfego Pago, Sites e Landing Pages, E-commerce, Automações e IA, Sistemas Sob Medida e Dados e Analytics.',
-};
+    'Tráfego pago, sites e landing pages, e-commerce, automações com IA, sistemas sob medida e dados: as 6 soluções da RUNA para sua empresa crescer.',
+  path: '/solucoes',
+  image: '/og/solucoes.jpg',
+});
 
 export default function SolucoesPage() {
   return (

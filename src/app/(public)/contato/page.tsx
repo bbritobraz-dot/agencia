@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import Link from 'next/link';
 import { ArrowRight, Mail, MapPin } from 'lucide-react';
 import { ContactForm, ContactWhatsAppCard } from '@/components/public/ContactForm';
@@ -6,11 +7,13 @@ import { getServiceBySlug } from '@/config/services';
 
 const CONTACT_EMAIL = 'contato@airuna.com.br';
 
-export const metadata: Metadata = {
-  title: 'Contato — Fale com a RUNA',
+export const metadata: Metadata = pageMetadata({
+  title: 'Contato',
   description:
     'Fale com a RUNA pelo WhatsApp, e-mail ou formulário sobre tráfego pago, sites, e-commerce, automações com IA, sistemas sob medida e dados.',
-};
+  path: '/contato',
+  image: '/og/contato.jpg',
+});
 
 export default async function ContatoPage({
   searchParams,

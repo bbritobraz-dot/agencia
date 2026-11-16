@@ -1,5 +1,5 @@
-'use client';
-
+import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 import { HomeHero } from '@/components/public/HomeHero';
 import { DiagnosticTeaser } from '@/components/public/DiagnosticTeaser';
 import { SolutionsExplorer } from '@/components/public/SolutionsExplorer';
@@ -8,6 +8,15 @@ import { ProjectShowcase } from '@/components/public/ProjectShowcase';
 import { MethodTimeline } from '@/components/public/MethodTimeline';
 import { BlogHighlights } from '@/components/public/BlogHighlights';
 import { FinalCta } from '@/components/public/FinalCta';
+
+export const metadata: Metadata = pageMetadata({
+  title: 'RUNA | Marketing, tecnologia e automação para empresas',
+  absoluteTitle: true,
+  description:
+    'Tráfego pago, sites que convertem, automações com IA e CRM próprio. A RUNA conecta aquisição, tecnologia e dados para sua empresa crescer.',
+  path: '/',
+  image: '/og/home.jpg',
+});
 
 export default function HomePage() {
 

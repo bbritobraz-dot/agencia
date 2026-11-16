@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Política de Privacidade e Proteção de Dados (LGPD)',
+export const metadata: Metadata = pageMetadata({
+  title: 'Política de Privacidade (LGPD)',
   description:
-    'Política de Privacidade e diretrizes de tratamento de dados pessoais da Agência RUNA em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018).',
-};
+    'Como a RUNA coleta, usa e protege dados pessoais, em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018).',
+  path: '/politica-de-privacidade',
+  image: '/og/privacidade.jpg',
+});
 
 export default function PoliticaDePrivacidadePage() {
   return (

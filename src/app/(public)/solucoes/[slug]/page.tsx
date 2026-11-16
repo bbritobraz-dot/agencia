@@ -6,6 +6,7 @@ import { getServiceBySlug, RUNA_SERVICES, SERVICE_HOOKS } from '@/config/service
 import { getPortfolioForService } from '@/config/projects';
 import { RUNA_BLOG_POSTS } from '@/config/blog';
 import { ServiceIcon } from '@/components/public/ServiceIcon';
+import { pageMetadata } from '@/lib/seo';
 import { PostCard } from '@/components/public/BlogHighlights';
 import { ServiceCtas, ServiceDemo, ServiceProjects } from '@/components/public/ServicePageParts';
 
@@ -28,14 +29,12 @@ export async function generateMetadata({
     };
   }
 
-  return {
+  return pageMetadata({
     title: service.seo.title,
     description: service.seo.description,
-    openGraph: {
-      title: `${service.seo.title} | RUNA`,
-      description: service.seo.description,
-    },
-  };
+    path: `/solucoes/${service.slug}`,
+    image: `/og/${service.slug}.jpg`,
+  });
 }
 
 export default async function ServiceDetailPage({
