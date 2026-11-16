@@ -105,33 +105,55 @@ export const AUTHORIZED_CASE_SLOTS: AuthorizedCasePlaceholder[] = [
  * Não adicionar números de resultado aqui sem indicador auditável e autorizado.
  * `liveUrl`: preencher com o endereço real do site para exibir o link "Ver site no ar".
  */
-export type PortfolioType = 'site' | 'ecommerce' | 'landing';
+export type PortfolioType = 'site' | 'ecommerce' | 'landing' | 'sistema';
 
 export interface AuthorizedPortfolioItem {
   id: string;
   client: string;
   segment: string;
   type: PortfolioType;
-  /** Mockup de notebook em /public/site_portifolio (1600x1200) */
+  /** Imagem do projeto em /public */
   imageUrl: string;
+  /**
+   * 'mockup' = print dentro de um notebook (1600x1200, só a tela é recortada);
+   * 'screen' = print direto da tela (1440x900). Padrão: 'mockup'.
+   */
+  frame?: 'mockup' | 'screen';
   liveUrl?: string;
+  /** Print feito com dados fictícios (sistemas internos, sem expor clientes reais) */
+  demo?: boolean;
 }
 
 export const PORTFOLIO_TYPE_LABELS: Record<PortfolioType, string> = {
   site: 'Site institucional',
   ecommerce: 'Loja virtual',
   landing: 'Landing page',
+  sistema: 'Sistema sob medida',
 };
 
+/** Estilo de fundo que recorta só a tela do print, conforme o tipo de imagem */
+export function portfolioImageStyle(p: AuthorizedPortfolioItem): { backgroundImage: string; backgroundSize: string; backgroundPosition: string } {
+  return p.frame === 'screen'
+    ? { backgroundImage: `url(${p.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'top center' }
+    : { backgroundImage: `url(${p.imageUrl})`, backgroundSize: '132.1% auto', backgroundPosition: '50.6% 38.9%' };
+}
+
+// Ordem = ordem de exibição (os 6 primeiros aparecem em "Todos" na home)
 export const AUTHORIZED_PORTFOLIO: AuthorizedPortfolioItem[] = [
-  { id: 'tamara-rahall', client: 'Tâmara Rahall', segment: 'Nutrição · Foz do Iguaçu', type: 'site', imageUrl: '/site_portifolio/1.webp' },
+  { id: 'ozimme-loja', client: 'Ozimme', segment: 'Loja virtual de básicos premium', type: 'ecommerce', imageUrl: '/portfolio/ozimme-loja.webp', frame: 'screen', liveUrl: 'https://ozimme.com.br' },
+  { id: 'bellatrix', client: 'Bellatrix Persianas', segment: 'Persianas sob medida, com simulador de orçamento', type: 'site', imageUrl: '/portfolio/bellatrix.webp', frame: 'screen', liveUrl: 'https://www.persianasfoz.com.br' },
+  { id: 'olivertur', client: 'Olivertur Turismo', segment: 'Turismo receptivo, site em 3 idiomas', type: 'site', imageUrl: '/portfolio/olivertur.webp', frame: 'screen', liveUrl: 'https://www.oliverturfoz.com.br' },
+  { id: 'tamara-rahall', client: 'Tâmara Rahall', segment: 'Nutricionista · consultas presenciais e online', type: 'site', imageUrl: '/portfolio/tamara.webp', frame: 'screen', liveUrl: 'https://tamara-rho.vercel.app' },
+  { id: 'bellatrix-crm', client: 'Bellatrix · CRM e Orçamentos', segment: 'Clientes, orçamentos, produção e financeiro', type: 'sistema', imageUrl: '/portfolio/bellatrix-crm-painel.webp', frame: 'screen', demo: true },
+  { id: 'samara-academy', client: 'Samara Academy', segment: 'Escola de estética · cursos presenciais', type: 'site', imageUrl: '/portfolio/samara-cursos.webp', frame: 'screen', liveUrl: 'https://cursos.samaraacademy.com.br' },
+  { id: 'ozimme-uniformes', client: 'Ozimme Uniformes', segment: 'Uniformes empresariais direto da fábrica', type: 'landing', imageUrl: '/portfolio/ozimme-uniformes.webp', frame: 'screen', liveUrl: 'https://www.ozimmeuniformes.com.br' },
+  { id: 'ozimme-terceirao', client: 'Ozimme Terceirão', segment: 'Camisas de terceirão, formandos e turmas', type: 'landing', imageUrl: '/portfolio/ozimme-terceirao.webp', frame: 'screen', liveUrl: 'https://www.ozimmeuniformes.com.br/terceirao' },
+  { id: 'bellatrix-orcamentos', client: 'Bellatrix · Gerador de Orçamentos', segment: 'Cálculo automático de áreas, custos e margem', type: 'sistema', imageUrl: '/portfolio/bellatrix-crm-orcamento.webp', frame: 'screen', demo: true },
+  { id: 'samara-esthetic', client: 'Samara Esthetic Center', segment: 'Clínica de estética · tratamentos e valores', type: 'site', imageUrl: '/portfolio/samara-servicos.webp', frame: 'screen', liveUrl: 'https://www.samaraacademy.com.br' },
   { id: 'maynds', client: 'Maynds', segment: 'Chocolates sem açúcar', type: 'ecommerce', imageUrl: '/site_portifolio/2.webp' },
   { id: 'dc-arquitetura', client: 'DC Arquitetura', segment: 'Arquitetura e construção', type: 'site', imageUrl: '/site_portifolio/6.webp' },
-  { id: 'la-sordi', client: 'La Sordi', segment: 'Bolsas e acessórios', type: 'ecommerce', imageUrl: '/site_portifolio/5.webp' },
   { id: 'gabriella-cury', client: 'Gabriella Cury', segment: 'Curso de maquiagem · Recife', type: 'landing', imageUrl: '/site_portifolio/8.webp' },
   { id: 'museu-foz-cars', client: 'Museu Foz Cars', segment: 'Turismo · Foz do Iguaçu', type: 'site', imageUrl: '/site_portifolio/9.webp' },
-  { id: 'bellatrix', client: 'Bellatrix', segment: 'Persianas sob medida · Foz do Iguaçu', type: 'landing', imageUrl: '/site_portifolio/3.webp' },
-  { id: 'ozimme', client: 'Ozimme', segment: 'Estamparia e uniformes', type: 'ecommerce', imageUrl: '/site_portifolio/4.webp' },
   { id: 'slapple', client: 'Slapple', segment: 'Bens de consumo', type: 'ecommerce', imageUrl: '/site_portifolio/7.webp' },
 ];
 
@@ -139,6 +161,7 @@ export const AUTHORIZED_PORTFOLIO: AuthorizedPortfolioItem[] = [
 export const PORTFOLIO_BY_SERVICE: Record<string, PortfolioType[]> = {
   'sites-e-landing-pages': ['site', 'landing'],
   ecommerce: ['ecommerce'],
+  'sistemas-sob-medida': ['sistema'],
 };
 
 export function getPortfolioForService(slug: string): AuthorizedPortfolioItem[] {

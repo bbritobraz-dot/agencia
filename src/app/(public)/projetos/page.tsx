@@ -7,14 +7,15 @@ import { ServiceCtas } from '@/components/public/ServicePageParts';
 export const metadata: Metadata = {
   title: 'Projetos: Sites, Lojas Virtuais e Landing Pages',
   description:
-    'Veja sites institucionais, lojas virtuais e landing pages desenvolvidos pela RUNA para empresas de diferentes segmentos.',
+    'Veja sites institucionais, lojas virtuais, landing pages e sistemas desenvolvidos pela RUNA para empresas de diferentes segmentos.',
 };
 
-const TYPE_ORDER: PortfolioType[] = ['site', 'ecommerce', 'landing'];
+const TYPE_ORDER: PortfolioType[] = ['site', 'ecommerce', 'landing', 'sistema'];
 const TYPE_PLURAL: Record<PortfolioType, string> = {
   site: 'Sites',
   ecommerce: 'Lojas virtuais',
   landing: 'Landing pages',
+  sistema: 'Sistemas',
 };
 
 export default function ProjetosPage() {
@@ -33,11 +34,11 @@ export default function ProjetosPage() {
             <span className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">— Projetos</span>
             <h1 className="font-display text-4xl leading-tight text-white sm:text-5xl">Projetos que já estão no ar.</h1>
             <p className="text-base leading-relaxed text-[#E8E7DF]/85 sm:text-lg">
-              Sites, lojas e páginas de venda criados para negócios de diferentes segmentos. Clique em um projeto para ver os detalhes.
+              Sites, lojas, páginas de venda e sistemas criados para negócios de diferentes segmentos. Clique em um projeto para ver os detalhes.
             </p>
           </div>
 
-          <dl className="mt-10 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+          <dl className="mt-10 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-5">
             <div className="rounded-2xl border border-[#C97F38]/40 bg-[#C97F38]/15 p-4">
               <dt className="text-[11px] uppercase tracking-widest text-[#C97F38]">Projetos</dt>
               <dd className="mt-1 font-display text-3xl text-white">{total}</dd>

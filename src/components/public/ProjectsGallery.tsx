@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, MessageCircle, X } from 'lucide-re
 import {
   AUTHORIZED_PORTFOLIO,
   PORTFOLIO_TYPE_LABELS,
+  portfolioImageStyle,
   getServiceSlugForType,
   type AuthorizedPortfolioItem,
   type PortfolioType,
@@ -24,6 +25,7 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'site', label: 'Sites' },
   { key: 'ecommerce', label: 'Lojas virtuais' },
   { key: 'landing', label: 'Landing pages' },
+  { key: 'sistema', label: 'Sistemas' },
 ];
 
 function countOf(f: Filter) {
@@ -98,13 +100,9 @@ function ProjectModal({
                 <motion.div
                   key={p.id}
                   role="img"
-                  aria-label={`Site ${p.client}`}
+                  aria-label={`Projeto ${p.client}`}
                   className="aspect-[1211/758]"
-                  style={{
-                    backgroundImage: `url(${p.imageUrl})`,
-                    backgroundSize: '132.1% auto',
-                    backgroundPosition: '50.6% 38.9%',
-                  }}
+                  style={portfolioImageStyle(p)}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
@@ -130,6 +128,11 @@ function ProjectModal({
             </span>
             <h2 className="mt-3 font-display text-3xl text-[#1c1c10]">{p.client}</h2>
             <p className="mt-1 text-sm text-[#4c524b]">{p.segment}</p>
+            {p.demo && (
+              <p className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-lg bg-[#27594F]/10 px-2.5 py-1 text-[11px] font-medium text-[#27594F]">
+                Imagem com dados fictícios: os dados reais dos clientes ficam protegidos.
+              </p>
+            )}
 
             {service && (
               <div className="mt-6 rounded-2xl border border-[#d8d7cf] bg-[#E8E7DF]/60 p-4">

@@ -7,6 +7,7 @@ import { ArrowRight, ArrowUpRight, ShieldCheck } from 'lucide-react';
 import {
   AUTHORIZED_PORTFOLIO,
   PORTFOLIO_TYPE_LABELS,
+  portfolioImageStyle,
   type AuthorizedPortfolioItem,
   type PortfolioType,
 } from '@/config/projects';
@@ -21,6 +22,7 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'site', label: 'Sites' },
   { key: 'ecommerce', label: 'Lojas virtuais' },
   { key: 'landing', label: 'Landing pages' },
+  { key: 'sistema', label: 'Sistemas' },
 ];
 
 function count(f: Filter) {
@@ -54,13 +56,9 @@ export function ProjectCard({
         <div className="relative aspect-[1211/758] overflow-hidden">
           <div
             role="img"
-            aria-label={`Site ${p.client}`}
+            aria-label={`Projeto ${p.client}`}
             className={`absolute inset-0 transition-transform duration-[1.2s] ease-out ${reduce ? '' : 'group-hover:scale-[1.06]'}`}
-            style={{
-              backgroundImage: `url(${p.imageUrl})`,
-              backgroundSize: '132.1% auto',
-              backgroundPosition: '50.6% 38.9%',
-            }}
+            style={portfolioImageStyle(p)}
           />
           {/* camada no hover */}
           <div className="absolute inset-0 flex items-end bg-gradient-to-t from-[#13302a]/85 via-[#13302a]/10 to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -115,10 +113,10 @@ export function ProjectShowcase() {
           <div className="max-w-2xl space-y-3">
             <span className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">— Projetos</span>
             <h2 className="font-display text-3xl leading-tight text-[#1c1c10] sm:text-5xl">
-              Sites e lojas que já estão no ar.
+              Sites, lojas e sistemas que já estão rodando.
             </h2>
             <p className="text-base text-[#4c524b]">
-              De clínicas a e-commerces: cada projeto desenhado para o negócio e o público de cada cliente.
+              De clínicas a e-commerces e CRMs: cada projeto desenhado para o negócio e o público de cada cliente.
             </p>
           </div>
 
