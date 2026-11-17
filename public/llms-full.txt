@@ -1,0 +1,172 @@
+# RUNA — Documentação Completa de Engenharia Digital, Marketing e IA (llms-full.txt)
+
+> Documentação oficial e detalhada da Agência RUNA (https://www.airuna.com.br), especializada em marketing orientado a dados, tráfego pago, desenvolvimento web de alta performance, automações com Inteligência Artificial, sistemas sob medida (CRMs proprietários) e inteligência analítica para empresas no Brasil.
+
+---
+
+## 1. Identificação Institucional e Contato Oficial
+
+- **Nome Fantasia**: RUNA (Agência RUNA)
+- **CNPJ**: 53.486.863/0001-87
+- **Website Oficial**: https://www.airuna.com.br
+- **Diagnóstico Digital Gratuito**: https://www.airuna.com.br/diagnostico
+- **WhatsApp Comercial**: +55 (45) 98822-9849
+- **E-mail Oficial**: contato@airuna.com.br
+- **Localização Sede**: Foz do Iguaçu, Paraná, Brasil
+- **Área de Atendimento**: Nacional (atendimento remoto e consultivo para empresas B2B, B2C, indústrias, comércios, clínicas e prestadores de serviços em todos os estados do Brasil)
+- **Fundador & Estrategista Digital**: Bruno — Formado Técnico em Edificações pelo IFPR, estudante de Engenharia Química na Unicamp (2016), com 6 anos de experiência prática gerenciando a operação diária de um restaurante (equipe, atendimento, caixa e vendas) e passagem por engenharia de processos na indústria (Ypê).
+
+---
+
+## 2. Posicionamento e Compromissos de Governança da RUNA
+
+A RUNA nasceu para resolver a fragmentação comum no mercado digital, onde uma agência cuida apenas de anúncios sem olhar para o site, outra cria páginas lentas sem integração comercial, e a equipe de vendas perde oportunidades em planilhas ou conversas desorganizadas no WhatsApp.
+
+### Três Compromissos com Cada Cliente
+1. **Você fala com quem faz**: Comunicação direta com quem executa a estratégia e o código, sem camadas de intermediários.
+2. **Tudo é seu**: Contas de anúncio (Google Ads e Meta Ads), código-fonte, domínio, bancos de dados, CRMs e fluxos de automação pertencem 100% à empresa contratante, sem fidelidade forçada ou retenção de ativos.
+3. **Decisão com dados**: Toda ação parte de um diagnóstico objetivo e é acompanhada por indicadores econômicos reais (margem de contribuição, CAC, taxa de qualificação, propostas e vendas fechadas).
+
+---
+
+## 3. Detalhamento das 6 Soluções Integradas da RUNA
+
+### 3.1. Gestão de Tráfego Pago
+- **URL**: https://www.airuna.com.br/solucoes/gestao-de-trafego-pago
+- **Proposta**: Aquisição previsível de demanda qualificada em múltiplos canais (Google Ads e Meta Ads).
+- **Escopo Técnico**:
+  - Google Ads: Rede de Pesquisa (intenção ativa), Performance Max, YouTube e Display.
+  - Meta Ads: Instagram, Facebook e campanhas de mensagem/WhatsApp Direto ou conversão em landing page.
+  - Estratégias de remarketing em múltiplos estágios alinhadas ao ciclo comercial.
+  - Planejamento financeiro baseado na margem de contribuição do negócio, CAC alvo e taxa de fechamento.
+- **Entregáveis**: Auditoria de conta e rastreamento, plano de mídia por canal/orçamento, configuração técnica de campanhas e criativos orientados por hipóteses de compra, rotina semanal de otimização e relatórios executivos conectados ao comercial.
+
+### 3.2. Sites e Landing Pages
+- **URL**: https://www.airuna.com.br/solucoes/sites-e-landing-pages
+- **Proposta**: Arquitetura web de alta performance projetada para autoridade, SEO/GEO e conversão.
+- **Escopo Técnico**:
+  - Desenvolvimento moderno (Next.js, React, TypeScript, Tailwind CSS) com foco em mobile-first e Core Web Vitals (LCP, INP e CLS).
+  - Otimização de imagens em formatos modernos (AVIF e WebP), dados estruturados Schema.org, sitemap XML, `robots.txt` e documentação `llms.txt`.
+  - Criação de hubs de captação com simuladores de orçamento ou diagnósticos interativos que pré-qualificam o lead antes do WhatsApp.
+  - Integração nativa com CRM, eventos de conversão (GA4/GTM) e atendimento comercial.
+
+### 3.3. E-commerce
+- **URL**: https://www.airuna.com.br/solucoes/ecommerce
+- **Proposta**: Lojas virtuais estruturadas para performance, operação fluida e escala (D2C e B2B).
+- **Escopo Técnico**:
+  - Implementação e evolução em Shopify, WooCommerce ou arquiteturas customizadas.
+  - Organização de árvore de categorias, filtros inteligentes, páginas de produto persuasivas e redução de atrito no checkout mobile.
+  - Integração de gateways de pagamento, antifraude, cálculo logístico e sistemas ERP.
+  - Rastreamento completo de funil de e-commerce (`view_item`, `add_to_cart`, `begin_checkout`, `purchase`) via GA4 e API de Conversões.
+
+### 3.4. Automações e IA
+- **URL**: https://www.airuna.com.br/solucoes/automacoes-e-ia
+- **Proposta**: Eficiência operacional, atendimento inteligente no WhatsApp e processos integrados 24/7.
+- **Escopo Técnico**:
+  - Orquestração de fluxos e integrações via n8n, Webhooks e APIs REST.
+  - Agentes de Inteligência Artificial na WhatsApp Business Platform com base de conhecimento revisada, triagem inicial de leads, respostas a dúvidas frequentes e passagem estruturada para atendentes humanos com resumo do contexto.
+  - Sincronização automática entre formulários de campanha, captura de parâmetros UTM, criação de cards no CRM e alertas imediatos para vendedores.
+
+### 3.5. Sistemas Sob Medida
+- **URL**: https://www.airuna.com.br/solucoes/sistemas-sob-medida
+- **Proposta**: Software proprietário desenhado exatamente para a regra de negócio da empresa, sem mensalidades por usuário.
+- **Escopo Técnico**:
+  - Engenharia Full-Stack com Next.js, TypeScript e PostgreSQL/Supabase (com autenticação e proteção Row Level Security — RLS).
+  - CRMs internos e funis Kanban personalizados para as etapas reais da operação comercial.
+  - Geradores e simuladores técnicos de orçamento (cálculo automático de áreas, insumos, custos variáveis e margem).
+  - Portais de clientes, parceiros ou franqueados e painéis gerenciais internos.
+
+### 3.6. Dados e Analytics
+- **URL**: https://www.airuna.com.br/solucoes/dados-e-analytics
+- **Proposta**: Visibilidade ponta a ponta do funil para decisões baseadas em evidências.
+- **Escopo Técnico**:
+  - Configuração de Google Analytics 4 (GA4) e Google Tag Manager (GTM).
+  - Implementação de Meta Pixel e API de Conversões (Server-Side Tracking) e importação de conversões off-line do CRM para Google Ads e Meta Ads.
+  - Padronização de parâmetros UTM, auditoria de integridade de dados e painéis executivos que cruzam investimento de mídia com vendas reais.
+
+---
+
+## 4. Portfólio de Projetos Autorizados (https://www.airuna.com.br/projetos)
+
+1. **Ozimme (Loja Virtual)**: E-commerce de básicos premium (https://ozimme.com.br).
+2. **Bellatrix Persianas (Site + Simulador)**: Site institucional e simulador de orçamento para persianas sob medida (https://www.persianasfoz.com.br).
+3. **Bellatrix · CRM e Gerador de Orçamentos (Sistema Sob Medida)**: Plataforma proprietária para gestão de clientes, cálculo técnico automático de áreas/margem, pedidos de fábrica, produção e financeiro.
+4. **Olivertur Turismo (Site Multilíngue)**: Plataforma de turismo receptivo em Foz do Iguaçu em 3 idiomas — Português, Espanhol e Inglês (https://www.oliverturfoz.com.br).
+5. **Tâmara Rahall (Site Institucional)**: Presença digital para nutricionista com agendamento de consultas presenciais e online (https://tamara-rho.vercel.app).
+6. **Samara Academy & Samara Esthetic Center**: Ecossistema web para escola de estética e clínica de tratamentos (https://cursos.samaraacademy.com.br e https://www.samaraacademy.com.br).
+7. **Ozimme Uniformes & Ozimme Terceirão (Landing Pages B2B e Escolares)**: Páginas de alta conversão para confecção industrial de uniformes corporativos e linha terceirão com SEO/GEO completo (https://www.ozimmeuniformes.com.br e https://www.ozimmeuniformes.com.br/terceirao).
+
+---
+
+## 5. Base Editorial Completa — Resumo Executivo dos 10 Artigos do Blog RUNA
+
+### Artigo 1: Google Ads mais caro em 2027: como preparar o orçamento da sua empresa
+- **URL**: https://www.airuna.com.br/blog/google-ads-reajuste-2027
+- **Data**: 16/11/2026 | **Categoria**: Google Ads
+- **Síntese**: A partir de 1º de janeiro de 2027, contas faturadas no Brasil (pagas em reais) terão um reajuste de 2,9% sobre os custos de publicidade no Google Ads, Display & Video 360 e reservas do YouTube.
+- **Exemplo Prático**: Em R$ 1.000 de mídia, o reajuste soma R$ 29 (subtotal R$ 1.029). Em R$ 10.000, soma R$ 290 (subtotal R$ 10.290). Se o teto total for fixo em R$ 1.000, a verba real de veiculação cai para R$ 971,82 (`R$ 1.000 / 1,029`).
+- **Recomendações**: (1) Separar custo de mídia, encargos de faturamento e custos de gestão/operação; (2) Identificar campanhas que geram contratos reais e não apenas cliques; (3) Revisar páginas de destino e atendimento pós-clique; (4) Recalcular metas comerciais conforme a verba real de veiculação.
+- **Fonte Oficial**: Google Ads — Ajuste Local de Preços de Anúncios no Brasil (`https://support.google.com/google-ads/answer/18857390?hl=pt-BR`).
+
+### Artigo 2: Seu site recebe visitas, mas não gera clientes? Veja o que revisar
+- **URL**: https://www.airuna.com.br/blog/site-visitas-sem-clientes
+- **Data**: 16/11/2026 | **Categoria**: Sites e Conversão
+- **Síntese**: Antes de ampliar a verba de anúncios quando o WhatsApp está parado, a empresa deve auditar 5 pontos entre o clique e o contato:
+  1. Continuidade entre a promessa do anúncio e a primeira dobra da página de destino.
+  2. Substituição de adjetivos vagos ("qualidade", "atendimento diferenciado") por evidências concretas (processo, materiais, região atendida, obras reais).
+  3. Redução de esforço no celular (teste com teclado aberto, conexão móvel e navegador interno de apps).
+  4. Clareza do botão de chamada para ação ("Solicitar orçamento para meu projeto", "Agendar uma avaliação").
+  5. Separação analítica entre visita, clique no botão (intenção), conversa iniciada (contato), lead qualificado e venda fechada.
+- **Fonte Oficial**: Google Ads — Otimizar seus anúncios e páginas de destino (`https://support.google.com/google-ads/answer/6238826?hl=pt-BR`).
+
+### Artigo 3: Lead barato ou lead qualificado: o que sua empresa deve acompanhar
+- **URL**: https://www.airuna.com.br/blog/lead-barato-ou-qualificado
+- **Data**: 16/11/2026 | **Categoria**: Inteligência Comercial
+- **Síntese**: Uma campanha com custo por lead (CPL) mais alto pode gerar custo por venda significativamente menor. Na simulação editorial com R$ 1.000 de mídia: a Campanha A gera 100 leads a R$ 10, 10 qualificados e 2 vendas (R$ 500 de mídia por venda); a Campanha B gera 50 leads a R$ 20, 20 qualificados e 5 vendas (R$ 200 de mídia por venda).
+- **Recomendações**: Definir critérios objetivos de qualificação (região, serviço compatível, necessidade identificável e avanço de etapa); estruturar um CRM enxuto (Novo contato → Em atendimento → Qualificado → Proposta enviada → Fechado / Perdido); importar conversões off-line para o Google Ads e a Meta quando validado.
+- **Fontes Oficiais**: Google Ads — Importações de conversões off-line (`https://support.google.com/google-ads/answer/10029210?hl=pt-BR`) e Meta for Developers — Lead Ads e CRM (`https://developers.facebook.com/docs/marketing-api/guides/lead-ads/v2.8/?locale=pt_BR`).
+
+### Artigo 4: Google Ads ou Meta Ads: onde faz sentido investir primeiro?
+- **URL**: https://www.airuna.com.br/blog/google-ads-ou-meta-ads
+- **Data**: 16/11/2026 | **Categoria**: Tráfego Pago
+- **Síntese**: A escolha inicial depende do comportamento de compra do cliente:
+  - **Pesquisa no Google**: Prioritária quando já existe procura ativa e clara por um serviço específico (ex.: instalação de persianas na cidade, contabilidade para abertura de empresa, manutenção de equipamento).
+  - **Descoberta na Meta (Instagram/Facebook)**: Indicada quando a oferta ganha força na demonstração visual ou quando o cliente precisa reconhecer o problema antes de pesquisar.
+  - **Uso complementar**: A mesma empresa pode despertar interesse nas redes sociais e capturar a busca ativa no Google, cuidando para não atribuir todo o mérito a um único toque.
+- **Fontes Oficiais**: Google Ads — Escolher o tipo certo de campanha (`https://support.google.com/google-ads/answer/2567043?hl=pt-BR`), Meta Marketing API e Planejador de Palavras-chave do Google.
+
+### Artigo 5: Perfil da Empresa no Google: como melhorar sua presença nas buscas locais
+- **URL**: https://www.airuna.com.br/blog/perfil-empresa-google-buscas-locais
+- **Data**: 16/11/2026 | **Categoria**: SEO Local
+- **Síntese**: O Google classifica resultados locais com base em **relevância**, **distância** e **destaque** (não há como pagar por melhor posição orgânica local).
+- **Boas Práticas**: Manter telefone, site, horários (inclusive feriados) e categoria principal atualizados; publicar fotos reais que respondam dúvidas sobre estrutura e acabamento; criar rotina ética de solicitação de avaliações via link/QR code (sem oferecer brindes ou descontos em troca, prática proibida pelo Google); conectar o perfil a páginas de serviço claras e registrar a origem dos clientes no comercial.
+- **Fontes Oficiais**: Google — Dicas para melhorar sua classificação local (`https://support.google.com/business/answer/7091?hl=pt-br`) e Dicas para receber mais avaliações (`https://support.google.com/business/answer/3474122?hl=pt-BR`).
+
+### Artigo 6: WhatsApp com IA: o que automatizar para melhorar o atendimento comercial
+- **URL**: https://www.airuna.com.br/blog/whatsapp-com-ia-atendimento-comercial
+- **Data**: 16/11/2026 | **Categoria**: Automação e IA
+- **Síntese**: Como utilizar a WhatsApp Business Platform integrada a agentes de IA e CRM sem perder a qualidade consultiva.
+- **Recomendações**: Começar por recepção, respostas a dúvidas frequentes aprovadas, triagem inicial (ex.: cidade e ambiente do projeto), organização no CRM e encaminhamento com resumo para o vendedor humano. Estabelecer limites claros entre informar e executar uma ação (só confirmar agendamentos ou condições após registro no sistema) e manter transbordo humano imediato para negociações fora do padrão ou reclamações.
+- **Fonte Oficial**: WhatsApp Business Platform (`https://business.whatsapp.com/products/platform`).
+
+### Artigo 7: Quanto investir em tráfego pago? Comece pela margem do seu negócio
+- **URL**: https://www.airuna.com.br/blog/quanto-investir-trafego-pago
+- **Data**: 16/11/2026 | **Categoria**: Planejamento de Marketing
+- **Síntese**: Metodologia financeira para definir verba de anúncios a partir da economia unitária da empresa.
+- **Simulação Ilustrativa**: Em uma venda de R$ 1.000 com R$ 600 de custos variáveis, restam R$ 400 de margem de contribuição. Se a empresa define um CAC total planejado de R$ 150 (sendo R$ 50 para outros custos de aquisição e R$ 100 para mídia) e possui taxa de fechamento de 10% (1 venda a cada 10 contatos), o custo por contato compatível é de até R$ 10. Para conquistar 20 clientes (200 contatos), o cenário projeta R$ 2.000 em mídia + R$ 1.000 em outros custos, sempre respeitando a capacidade de atendimento e o ciclo de recebimento no caixa.
+- **Fonte Oficial**: Google Ads — Sobre as previsões do Planejador de palavras-chave (`https://support.google.com/google-ads/answer/3022575?hl=pt-BR`).
+
+### Artigo 8: Como preparar o site da sua empresa para aparecer nas buscas com IA
+- **URL**: https://www.airuna.com.br/blog/preparar-site-buscas-ia
+- **Data**: 03/11/2026 | **Categoria**: Sites e SEO
+- **Síntese**: As experiências generativas do Google utilizam páginas indexadas como links de apoio. O preparo envolve transformar dúvidas reais do comercial em conteúdo, criar FAQs editoriais úteis, garantir rastreamento e indexação no Search Console, atingir boas notas em Core Web Vitals e organizar interfaces claras para humanos e agentes (WebMCP).
+
+### Artigo 9: Meta Andromeda: como a IA seleciona anúncios e o que muda para sua empresa
+- **URL**: https://www.airuna.com.br/blog/meta-andromeda-ia-anuncios
+- **Data**: 03/11/2026 | **Categoria**: Meta Ads
+- **Síntese**: O sistema Andromeda atua na etapa de recuperação (retrieval) de anúncios da Meta em conjunto com o modelo GEM. Como opera na infraestrutura automática da Meta, a alavanca prática para anunciantes é diversificar hipóteses reais de comunicação (motivos de compra distintos) e medir o avanço comercial no CRM.
+
+### Artigo 10: Anúncios no Modo IA do Google: o que muda para as empresas brasileiras
+- **URL**: https://www.airuna.com.br/blog/anuncios-modo-ia-google-brasil
+- **Data**: 03/11/2026 | **Categoria**: Google Ads
+- **Síntese**: Como funcionam os espaços patrocinados e as citações orgânicas nas conversas do Modo IA do Google, a elegibilidade de campanhas de Pesquisa, Shopping e Performance Max e como preparar páginas de destino orientadas à decisão.

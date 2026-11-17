@@ -8,14 +8,61 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${baseUrl}/`, lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
-    { url: `${baseUrl}/solucoes`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/diagnostico`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
-    { url: `${baseUrl}/projetos`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/sobre`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/blog`, lastModified: now, changeFrequency: 'weekly', priority: 0.85 },
-    { url: `${baseUrl}/contato`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
-    { url: `${baseUrl}/politica-de-privacidade`, lastModified: now, changeFrequency: 'yearly', priority: 0.4 },
+    {
+      url: `${baseUrl}/`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 1.0,
+      images: [`${baseUrl}/og/home.jpg`],
+    },
+    {
+      url: `${baseUrl}/solucoes`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      images: [`${baseUrl}/og/solucoes.jpg`],
+    },
+    {
+      url: `${baseUrl}/diagnostico`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.95,
+      images: [`${baseUrl}/og/diagnostico.jpg`],
+    },
+    {
+      url: `${baseUrl}/projetos`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.85,
+      images: [`${baseUrl}/og/projetos.jpg`],
+    },
+    {
+      url: `${baseUrl}/sobre`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+      images: [`${baseUrl}/og/sobre.jpg`],
+    },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      images: [`${baseUrl}/og/blog.jpg`],
+    },
+    {
+      url: `${baseUrl}/contato`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.85,
+      images: [`${baseUrl}/og/contato.jpg`],
+    },
+    {
+      url: `${baseUrl}/politica-de-privacidade`,
+      lastModified: now,
+      changeFrequency: 'yearly',
+      priority: 0.4,
+    },
   ];
 
   const serviceRoutes: MetadataRoute.Sitemap = RUNA_SERVICES.map((service) => ({
@@ -23,16 +70,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: now,
     changeFrequency: 'weekly',
     priority: 0.9,
+    images: [`${baseUrl}/og/${service.slug}.jpg`],
   }));
 
   const blogRoutes: MetadataRoute.Sitemap = RUNA_BLOG_POSTS.filter(
     (post) => post.status === 'published'
-  ).map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.updated),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }));
+  ).map((post) => {
+    const coverOg = post.cover.png.replace(/\.png$/, '-og.jpg');
+    return {
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: new Date(post.updated),
+      changeFrequency: 'monthly',
+      priority: 0.85,
+      images: [`${baseUrl}${coverOg}`, `${baseUrl}${post.cover.webp}`],
+    };
+  });
 
   return [...staticRoutes, ...serviceRoutes, ...blogRoutes];
 }

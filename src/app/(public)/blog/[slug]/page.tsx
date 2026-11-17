@@ -6,6 +6,7 @@ import {
   RUNA_BLOG_POSTS,
   getBlogPostBySlug,
   formatBlogDate,
+  type BlogPost,
 } from '@/config/blog';
 import { RUNA_SERVICES } from '@/config/services';
 import {
@@ -15,6 +16,16 @@ import { ServiceIcon } from '@/components/public/ServiceIcon';
 import { GoogleModoIaArticleContent } from '@/components/blog/GoogleModoIaArticleContent';
 import { MetaAndromedaArticleContent } from '@/components/blog/MetaAndromedaArticleContent';
 import { SiteBuscasIaArticleContent } from '@/components/blog/SiteBuscasIaArticleContent';
+import {
+  GoogleAdsReajuste2027Content,
+  SiteVisitasSemClientesContent,
+  LeadBaratoOuQualificadoContent,
+  GoogleAdsOuMetaAdsContent,
+  PerfilEmpresaGoogleContent,
+  WhatsappComIaContent,
+  QuantoInvestirTrafegoPagoContent,
+} from '@/components/blog/Nov2026ArticlesContent';
+import { PostCard } from '@/components/public/BlogHighlights';
 import {
   ArrowLeft,
   ArrowRight,
@@ -59,7 +70,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: post.seoTitle,
     description: post.metaDescription,
-    authors: [{ name: post.author }],
+    authors: [{ name: post.author, url: `${SITE_DOMAIN}/sobre` }],
     keywords: post.tags,
     alternates: {
       canonical: canonicalUrl,
@@ -67,12 +78,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       type: 'article',
       locale: 'pt_BR',
+      siteName: 'RUNA',
       url: canonicalUrl,
       title: post.seoTitle,
       description: post.metaDescription,
       publishedTime: post.date,
       modifiedTime: post.updated,
       authors: [post.author],
+      section: post.category,
       tags: post.tags,
       images: [
         {
@@ -109,6 +122,32 @@ function CitationRef({ ids }: { ids: number[] }) {
   );
 }
 
+function renderArticleBody(post: BlogPost) {
+  switch (post.slug) {
+    case 'google-ads-reajuste-2027':
+      return <GoogleAdsReajuste2027Content post={post} />;
+    case 'site-visitas-sem-clientes':
+      return <SiteVisitasSemClientesContent post={post} />;
+    case 'lead-barato-ou-qualificado':
+      return <LeadBaratoOuQualificadoContent post={post} />;
+    case 'google-ads-ou-meta-ads':
+      return <GoogleAdsOuMetaAdsContent post={post} />;
+    case 'perfil-empresa-google-buscas-locais':
+      return <PerfilEmpresaGoogleContent post={post} />;
+    case 'whatsapp-com-ia-atendimento-comercial':
+      return <WhatsappComIaContent post={post} />;
+    case 'quanto-investir-trafego-pago':
+      return <QuantoInvestirTrafegoPagoContent post={post} />;
+    case 'preparar-site-buscas-ia':
+      return <SiteBuscasIaArticleContent post={post} />;
+    case 'meta-andromeda-ia-anuncios':
+      return <MetaAndromedaArticleContent post={post} />;
+    case 'anuncios-modo-ia-google-brasil':
+    default:
+      return <GoogleModoIaArticleContent post={post} />;
+  }
+}
+
 export default async function BlogArticlePage({ params }: PageProps) {
   const { slug } = await params;
   const post = getBlogPostBySlug(slug);
@@ -123,40 +162,90 @@ export default async function BlogArticlePage({ params }: PageProps) {
   const relatedServices = RUNA_SERVICES.filter((service) =>
     post.relatedServiceSlugs.includes(service.slug)
   );
+  const relatedArticles = RUNA_BLOG_POSTS.filter(
+    (item) => item.status === 'published' && item.slug !== post.slug
+  )
+    .sort((a, b) => {
+      const aOverlap = a.relatedServiceSlugs.filter((s) =>
+        post.relatedServiceSlugs.includes(s)
+      ).length;
+      const bOverlap = b.relatedServiceSlugs.filter((s) =>
+        post.relatedServiceSlugs.includes(s)
+      ).length;
+      return bOverlap - aOverlap;
+    })
+    .slice(0, 3);
 
-  const blogPostingJsonLd = {
+  const structuredDataJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': canonicalUrl,
-    },
-    headline: post.title,
-    alternativeHeadline: post.seoTitle,
-    description: post.metaDescription,
-    image: [
-      `${SITE_DOMAIN}${post.cover.avif}`,
-      `${SITE_DOMAIN}${post.cover.webp}`,
-      `${SITE_DOMAIN}${coverOg}`,
-    ],
-    author: {
-      '@type': 'Person',
-      name: post.author,
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'RUNA',
-      logo: {
-        '@type': 'ImageObject',
-        url: `${SITE_DOMAIN}/logo-green.webp`,
+    '@graph': [
+      {
+        '@type': 'BlogPosting',
+        '@id': `${canonicalUrl}#article`,
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': canonicalUrl,
+        },
+        headline: post.title,
+        alternativeHeadline: post.seoTitle,
+        description: post.metaDescription,
+        image: [
+          `${SITE_DOMAIN}${post.cover.avif}`,
+          `${SITE_DOMAIN}${post.cover.webp}`,
+          `${SITE_DOMAIN}${coverOg}`,
+        ],
+        author: {
+          '@type': 'Person',
+          name: post.author,
+          jobTitle: post.authorRole,
+          url: `${SITE_DOMAIN}/sobre`,
+        },
+        publisher: {
+          '@type': 'Organization',
+          '@id': `${SITE_DOMAIN}/#organization`,
+          name: 'RUNA',
+          url: SITE_DOMAIN,
+          logo: {
+            '@type': 'ImageObject',
+            url: `${SITE_DOMAIN}/logo-green.webp`,
+          },
+        },
+        datePublished: post.date,
+        dateModified: post.updated,
+        articleSection: post.category,
+        keywords: post.tags.join(', '),
+        inLanguage: 'pt-BR',
+        url: canonicalUrl,
+        citation: post.sources.map((s) => ({
+          '@type': 'CreativeWork',
+          name: s.label,
+          url: s.url,
+        })),
       },
-    },
-    datePublished: post.date,
-    dateModified: post.updated,
-    articleSection: post.category,
-    keywords: post.tags.join(', '),
-    inLanguage: 'pt-BR',
-    url: canonicalUrl,
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: SITE_DOMAIN,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Blog RUNA',
+            item: `${SITE_DOMAIN}/blog`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: post.title,
+            item: canonicalUrl,
+          },
+        ],
+      },
+    ],
   };
 
   return (
@@ -164,7 +253,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDataJsonLd) }}
       />
 
       {/* Article Header */}
@@ -362,13 +451,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
               </div>
 
               {/* Dynamic Article Content based on slug */}
-              {post.slug === 'preparar-site-buscas-ia' ? (
-                <SiteBuscasIaArticleContent post={post} />
-              ) : post.slug === 'meta-andromeda-ia-anuncios' ? (
-                <MetaAndromedaArticleContent post={post} />
-              ) : (
-                <GoogleModoIaArticleContent post={post} />
-              )}
+              {renderArticleBody(post)}
 
               {/* Perguntas Frequentes */}
               <section id="perguntas-frequentes" className="mt-12 scroll-mt-28">
@@ -400,17 +483,12 @@ export default async function BlogArticlePage({ params }: PageProps) {
 
               {/* Fontes Oficiais */}
               <section
-                id={post.slug === 'meta-andromeda-ia-anuncios' ? 'fontes-oficiais' : 'fontes'}
+                id="fontes"
                 className="mt-12 scroll-mt-28 border-t border-[#d8d7cf] pt-8"
               >
                 <h2 className="font-serif text-xl sm:text-2xl font-medium text-[#1c1c10]">
-                  Fontes oficiais
+                  {post.sources.length === 1 ? 'Fonte oficial' : 'Fontes oficiais'}
                 </h2>
-                <p className="mt-2 text-xs sm:text-sm text-[#4c524b]">
-                  {post.slug === 'meta-andromeda-ia-anuncios'
-                    ? 'Fontes técnicas oficiais consultadas:'
-                    : 'Fontes oficiais consultadas em 3 de novembro de 2026:'}
-                </p>
 
                 <ol className="mt-4 space-y-3 text-xs sm:text-sm text-[#323630]">
                   {post.sources.map((source) => (
@@ -433,9 +511,9 @@ export default async function BlogArticlePage({ params }: PageProps) {
                   ))}
                 </ol>
 
-                {post.slug === 'meta-andromeda-ia-anuncios' && (
+                {post.sourceNote && (
                   <p className="mt-4 text-xs italic text-[#4c524b]">
-                    *As orientações de criação, testes e gestão apresentadas neste artigo são análise editorial aplicada ao contexto empresarial.
+                    {post.sourceNote}
                   </p>
                 )}
               </section>
@@ -443,6 +521,36 @@ export default async function BlogArticlePage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* Continue Lendo: Artigos Relacionados */}
+      {relatedArticles.length > 0 && (
+        <section className="border-t border-[#d8d7cf] bg-[#fcfae5] py-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">
+                  — Continue aprofundando
+                </span>
+                <h2 className="mt-2 font-serif text-2xl sm:text-3xl font-medium text-[#1c1c10]">
+                  Outros artigos para apoiar a gestão da sua empresa
+                </h2>
+              </div>
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-[#1e4840] hover:text-[#C97F38]"
+              >
+                Ver todos os {RUNA_BLOG_POSTS.filter((p) => p.status === 'published').length} artigos
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {relatedArticles.map((item) => (
+                <PostCard key={item.slug} post={item} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

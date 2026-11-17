@@ -1,0 +1,52 @@
+# RUNA — Marketing, Tecnologia e Inteligência Comercial para Empresas
+
+> Agência de marketing orientado a dados, engenharia de software sob medida e automação comercial com Inteligência Artificial. Sediada em Foz do Iguaçu, PR, com atendimento para empresas em todo o Brasil (CNPJ 53.486.863/0001-87).
+
+A RUNA conecta aquisição de clientes (Google Ads e Meta Ads), desenvolvimento web de alta conversão (sites, landing pages e e-commerce), automações inteligentes (WhatsApp com IA e fluxos em n8n), sistemas proprietários (CRMs sob medida, simuladores e portais) e mensuração avançada (GA4, GTM e API de Conversões server-side) em uma única arquitetura integrada.
+
+## Páginas Principais
+
+- [Página Inicial](https://www.airuna.com.br/): Visão geral do ecossistema integrado de marketing, tecnologia e dados da RUNA.
+- [Diagnóstico Digital Gratuito](https://www.airuna.com.br/diagnostico): Avaliação interativa gratuita em 2 minutos nos 6 pilares digitais com pontuação de maturidade e mapa de prioridades.
+- [Soluções e Engenharia Digital](https://www.airuna.com.br/solucoes): As 6 soluções integradas da RUNA para atrair clientes, converter visitas e automatizar operações.
+- [Portfólio e Projetos no Ar](https://www.airuna.com.br/projetos): Vitrine de sites institucionais, lojas virtuais, landing pages e sistemas sob medida desenvolvidos pela RUNA.
+- [Sobre a RUNA e Fundador](https://www.airuna.com.br/sobre): Trajetória de Bruno (formação em Engenharia Química na Unicamp, Técnico em Edificações no IFPR, 6 anos de gestão operacional e processos industriais) e os 3 compromissos da RUNA.
+- [Blog RUNA — Editorial & Inteligência Digital](https://www.airuna.com.br/blog): Análises práticas e guias sobre Google Ads, Meta Ads, IA, SEO, CRM e conversão explicados para decisores.
+- [Contato Comercial](https://www.airuna.com.br/contato): Atendimento via WhatsApp (+55 45 98822-9849), e-mail (contato@airuna.com.br) ou formulário.
+
+## Soluções Especializadas
+
+- [Gestão de Tráfego Pago](https://www.airuna.com.br/solucoes/gestao-de-trafego-pago): Estruturação e otimização contínua de campanhas em Google Ads (Pesquisa, Performance Max, YouTube) e Meta Ads (Instagram, Facebook e WhatsApp) com foco em CAC, margem e oportunidades qualificadas.
+- [Sites e Landing Pages](https://www.airuna.com.br/solucoes/sites-e-landing-pages): Desenvolvimento de sites institucionais, landing pages de alta conversão e simuladores interativos com Next.js, SEO técnico, Core Web Vitals e integração nativa com CRM.
+- [E-commerce](https://www.airuna.com.br/solucoes/ecommerce): Implantação e otimização de lojas virtuais em Shopify, WooCommerce ou arquiteturas dedicadas, com checkout de baixa fricção, integrações logísticas/ERP e rastreamento de funil.
+- [Automações e IA](https://www.airuna.com.br/solucoes/automacoes-e-ia): Agentes de Inteligência Artificial no WhatsApp para triagem e qualificação comercial, orquestração de fluxos em n8n e integração automática entre marketing e vendas.
+- [Sistemas Sob Medida](https://www.airuna.com.br/solucoes/sistemas-sob-medida): Desenvolvimento full-stack (Next.js, TypeScript, PostgreSQL/Supabase) de CRMs próprios sem mensalidades por usuário, calculadoras de orçamento, dashboards e portais de clientes.
+- [Dados e Analytics](https://www.airuna.com.br/solucoes/dados-e-analytics): Implementação profissional de Google Analytics 4 (GA4), Google Tag Manager (GTM), Meta Pixel, API de Conversões (Server-Side Tracking) e painéis executivos.
+
+## Artigos e Guias Estratégicos (Blog RUNA)
+
+- [Google Ads mais caro em 2027: como preparar o orçamento da sua empresa](https://www.airuna.com.br/blog/google-ads-reajuste-2027): Análise do reajuste de 2,9% anunciado pelo Google Brasil a partir de 01/01/2027, simulações práticas de verba e checklist de revisão comercial.
+- [Seu site recebe visitas, mas não gera clientes? Veja o que revisar](https://www.airuna.com.br/blog/site-visitas-sem-clientes): Como diagnosticar perdas entre o clique no anúncio e o contato comercial, revisando promessa, provas, formulário mobile e leitura de funil.
+- [Lead barato ou lead qualificado: o que sua empresa deve acompanhar](https://www.airuna.com.br/blog/lead-barato-ou-qualificado): Comparativo econômico entre custo por contato e custo por venda, critérios de qualificação comercial e integração de conversões off-line com Google Ads e Meta Ads.
+- [Google Ads ou Meta Ads: onde faz sentido investir primeiro?](https://www.airuna.com.br/blog/google-ads-ou-meta-ads): Matriz de decisão baseada no comportamento de compra (intenção ativa de busca vs. descoberta visual nos feeds), oferta e capacidade de atendimento.
+- [Perfil da Empresa no Google: como melhorar sua presença nas buscas locais](https://www.airuna.com.br/blog/perfil-empresa-google-buscas-locais): Funcionamento de relevância, distância e destaque nas buscas locais, revisão de dados, fotos, rotina de avaliações autênticas e conexão com o site.
+- [WhatsApp com IA: o que automatizar para melhorar o atendimento comercial](https://www.airuna.com.br/blog/whatsapp-com-ia-atendimento-comercial): Escopo prático de automação na WhatsApp Business Platform (recepção, triagem, FAQ, registro no CRM e passagem para atendente humano) com limites claros de decisão.
+- [Quanto investir em tráfego pago? Comece pela margem do seu negócio](https://www.airuna.com.br/blog/quanto-investir-trafego-pago): Metodologia para calcular orçamento de mídia a partir da margem de contribuição, CAC planejado, taxa de fechamento comercial e fluxo de caixa.
+- [Como preparar o site da sua empresa para aparecer nas buscas com IA](https://www.airuna.com.br/blog/preparar-site-buscas-ia): Guia sobre conteúdo orientado a dúvidas reais, FAQ editorial, indexação técnica, Core Web Vitals e preparação para agentes autônomos (WebMCP).
+- [Meta Andromeda: como a IA seleciona anúncios e o que muda para sua empresa](https://www.airuna.com.br/blog/meta-andromeda-ia-anuncios): Como o sistema de recuperação de anúncios da Meta e o modelo GEM operam nos bastidores e como estruturar testes por motivos de compra.
+- [Anúncios no Modo IA do Google: o que muda para as empresas brasileiras](https://www.airuna.com.br/blog/anuncios-modo-ia-google-brasil): Funcionamento dos espaços patrocinados e citações orgânicas na busca conversacional do Google e prioridades de preparação.
+
+## Dados Institucionais e Contato
+
+- **Empresa**: Agência RUNA
+- **CNPJ**: 53.486.863/0001-87
+- **Fundador**: Bruno (Fundador & Estrategista Digital)
+- **Sede**: Foz do Iguaçu, Paraná, Brasil (Atendimento em todo o território nacional)
+- **WhatsApp Comercial**: +55 (45) 98822-9849
+- **E-mail Oficial**: contato@airuna.com.br
+
+## Optional
+
+- [Documentação Completa para IA (llms-full.txt)](https://www.airuna.com.br/llms-full.txt): Base detalhada com metodologia, especificações das 6 soluções, portfólio autorizado e resumos executivos dos 10 artigos técnicos.
+- [Sitemap XML Oficial](https://www.airuna.com.br/sitemap.xml): Mapa completo de URLs públicas indexáveis.
+- [Política de Privacidade e LGPD](https://www.airuna.com.br/politica-de-privacidade): Governança de dados e proteção de informações.

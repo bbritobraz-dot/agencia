@@ -7,11 +7,34 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
+        userAgent: [
+          'Googlebot',
+          'Googlebot-Image',
+          'Bingbot',
+          'DuckDuckBot',
+          'Applebot',
+          'GPTBot',
+          'ChatGPT-User',
+          'OAI-SearchBot',
+          'ClaudeBot',
+          'Claude-Web',
+          'anthropic-ai',
+          'PerplexityBot',
+          'Google-Extended',
+          'Applebot-Extended',
+          'Meta-ExternalAgent',
+          'cohere-ai',
+        ],
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
+      },
+      {
         userAgent: '*',
         allow: '/',
         disallow: ['/admin/', '/api/'],
       },
     ],
+    host: baseUrl,
     sitemap: `${baseUrl}/sitemap.xml`,
   };
 }

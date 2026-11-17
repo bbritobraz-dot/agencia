@@ -10,23 +10,24 @@ interface Props {
 }
 
 export function BlogListClient({ posts }: Props) {
-  const [selectedTag, setSelectedTag] = useState<string>('Todos');
+  const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [query, setQuery] = useState('');
 
-  const allTags = ['Todos', ...Array.from(new Set(posts.flatMap((p) => [p.category, ...p.tags])))];
+  const categories = ['Todos', ...Array.from(new Set(posts.map((p) => p.category)))];
 
   const filteredPosts = posts.filter((post) => {
-    const matchesTag =
-      selectedTag === 'Todos' ||
-      post.category === selectedTag ||
-      post.tags.includes(selectedTag);
+    const matchesCategory =
+      selectedCategory === 'Todos' ||
+      post.category === selectedCategory ||
+      post.tags.includes(selectedCategory);
     const q = query.trim().toLowerCase();
     const matchesQuery =
       !q ||
       post.title.toLowerCase().includes(q) ||
       post.excerpt.toLowerCase().includes(q) ||
+      post.category.toLowerCase().includes(q) ||
       post.tags.some((t) => t.toLowerCase().includes(q));
-    return matchesTag && matchesQuery;
+    return matchesCategory && matchesQuery;
   });
 
   const featuredPost = filteredPosts[0];
@@ -35,34 +36,34 @@ export function BlogListClient({ posts }: Props) {
   return (
     <div className="space-y-12">
       {/* Filter & Search Bar */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 rounded-2xl border border-[#d8d7cf] bg-[#fcfae5] p-4 sm:p-5 shadow-sm">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 rounded-2xl border border-[#d8d7cf] bg-[#fcfae5] p-4 sm:p-5 shadow-sm">
         <div className="flex flex-wrap items-center gap-2">
-          {allTags.map((tag) => {
-            const active = selectedTag === tag;
+          {categories.map((cat) => {
+            const active = selectedCategory === cat;
             return (
               <button
-                key={tag}
+                key={cat}
                 type="button"
-                onClick={() => setSelectedTag(tag)}
+                onClick={() => setSelectedCategory(cat)}
                 className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
                   active
                     ? 'bg-[#1e4840] text-[#fcfae5] shadow-sm'
                     : 'bg-[#E8E7DF] text-[#323630] hover:bg-[#d8d7cf]'
                 }`}
               >
-                {tag}
+                {cat}
               </button>
             );
           })}
         </div>
 
-        <div className="relative w-full md:w-72">
+        <div className="relative w-full lg:w-72 shrink-0">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8a897c]" />
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar assunto ou tag..."
+            placeholder="Buscar assunto, categoria ou tag..."
             className="w-full rounded-xl border border-[#d8d7cf] bg-white py-2 pl-9 pr-3.5 text-sm text-[#1c1c10] placeholder:text-[#8a897c] focus:border-[#27594F] focus:outline-none"
           />
         </div>
@@ -76,7 +77,7 @@ export function BlogListClient({ posts }: Props) {
           <button
             type="button"
             onClick={() => {
-              setSelectedTag('Todos');
+              setSelectedCategory('Todos');
               setQuery('');
             }}
             className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#1e4840] px-4 py-2 text-xs font-semibold text-white"
@@ -136,13 +137,15 @@ export function BlogListClient({ posts }: Props) {
 
                     <div className="mt-5 flex flex-wrap gap-1.5">
                       {featuredPost.tags.map((tag) => (
-                        <span
+                        <button
                           key={tag}
-                          className="inline-flex items-center gap-1 rounded-md border border-[#d8d7cf] bg-[#E8E7DF]/60 px-2.5 py-1 text-[11px] font-medium text-[#323630]"
+                          type="button"
+                          onClick={() => setQuery(tag)}
+                          className="inline-flex items-center gap-1 rounded-md border border-[#d8d7cf] bg-[#E8E7DF]/60 px-2.5 py-1 text-[11px] font-medium text-[#323630] hover:border-[#C97F38]"
                         >
                           <Tag className="h-3 w-3 text-[#C97F38]" />
                           {tag}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -175,7 +178,7 @@ export function BlogListClient({ posts }: Props) {
             </article>
           )}
 
-          {/* Secondary Grid (for future articles) */}
+          {/* Secondary Grid */}
           {remainingPosts.length > 0 && (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {remainingPosts.map((post) => (
@@ -214,7 +217,7 @@ export function BlogListClient({ posts }: Props) {
                     </div>
                   </div>
                   <div className="px-6 pb-6 pt-3 border-t border-[#d8d7cf]/60 flex items-center justify-between text-xs font-semibold text-[#1e4840]">
-                    <span>Por {post.author}</span>
+                    <span>Por {post.author} · {post.readingTime.replace(' de leitura', '')}</span>
                     <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-1 text-[#C97F38] hover:underline">
                       Ler artigo <ArrowRight className="h-3.5 w-3.5" />
                     </Link>

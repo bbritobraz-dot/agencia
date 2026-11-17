@@ -6,7 +6,7 @@ import { getServiceBySlug, RUNA_SERVICES, SERVICE_HOOKS } from '@/config/service
 import { getPortfolioForService } from '@/config/projects';
 import { RUNA_BLOG_POSTS } from '@/config/blog';
 import { ServiceIcon } from '@/components/public/ServiceIcon';
-import { pageMetadata } from '@/lib/seo';
+import { pageMetadata, SITE_URL } from '@/lib/seo';
 import { PostCard } from '@/components/public/BlogHighlights';
 import { ServiceCtas, ServiceDemo, ServiceProjects } from '@/components/public/ServicePageParts';
 
@@ -55,8 +55,69 @@ export default async function ServiceDetailPage({
     (p) => p.status === 'published' && p.relatedServiceSlugs.includes(service.slug),
   ).slice(0, 3);
 
+  const serviceJsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Service',
+        '@id': `${SITE_URL}/solucoes/${service.slug}#service`,
+        name: service.title,
+        description: service.fullDescription,
+        url: `${SITE_URL}/solucoes/${service.slug}`,
+        provider: {
+          '@type': 'Organization',
+          '@id': `${SITE_URL}/#organization`,
+          name: 'RUNA',
+          url: SITE_URL,
+        },
+        areaServed: {
+          '@type': 'Country',
+          name: 'Brasil',
+        },
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: `Entregáveis — ${service.title}`,
+          itemListElement: service.deliverables.map((del) => ({
+            '@type': 'Offer',
+            itemOffered: {
+              '@type': 'Service',
+              name: del,
+            },
+          })),
+        },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: SITE_URL,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Soluções',
+            item: `${SITE_URL}/solucoes`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: service.title,
+            item: `${SITE_URL}/solucoes/${service.slug}`,
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+      />
       {/* 1. Topo: dor + nome da solução + demonstração animada */}
       <section className="overflow-hidden border-b border-[#27594F] bg-runa-pattern-dark py-14 text-white lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
