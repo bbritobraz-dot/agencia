@@ -65,27 +65,50 @@ export default function SolucoesPage() {
         </div>
       </section>
 
-      {/* Não sabe por onde começar */}
+      {/* Por segmento + Não sabe por onde começar */}
       <section className="border-t border-[#d8d7cf] bg-[#fcfae5] py-14 lg:py-16">
-        <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 px-4 sm:px-6 lg:flex-row lg:px-8">
-          <div className="flex items-start gap-4">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#27594F] text-[#C97F38]">
-              <Compass className="h-6 w-6" />
-            </span>
+        <div className="mx-auto max-w-5xl space-y-8 px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-[#d8d7cf] bg-[#E8E7DF]/60 p-6 sm:flex-row sm:items-center">
             <div>
-              <h2 className="font-display text-2xl text-[#1c1c10] sm:text-3xl">Não sabe por onde começar?</h2>
-              <p className="mt-1 text-sm text-[#4c524b] sm:text-base">
-                O diagnóstico gratuito avalia sua empresa nas 6 áreas e mostra qual priorizar, em 2 minutos.
+              <span className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">
+                — Estratégia por Setor
+              </span>
+              <h2 className="mt-1 font-display text-xl text-[#1c1c10] sm:text-2xl">
+                Quer ver como essas soluções se aplicam ao seu nicho?
+              </h2>
+              <p className="mt-1 text-xs sm:text-sm text-[#4c524b]">
+                Consulte nossas 30 páginas por segmento com canais, ideias de criativos, estrutura de site e CRM para cada tipo de negócio.
               </p>
             </div>
+            <Link
+              href="/segmentos"
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#1e4840] px-5 py-3 text-xs sm:text-sm font-semibold text-[#fcfae5] transition-colors hover:bg-[#27594F]"
+            >
+              Ver os 30 segmentos
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
-          <Link
-            href="/diagnostico"
-            className="group inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#C97F38] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#C97F38]/30 transition-all hover:-translate-y-0.5 hover:bg-[#b06b29]"
-          >
-            Fazer diagnóstico gratuito
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
+
+          <div className="flex flex-col items-center justify-between gap-6 lg:flex-row">
+            <div className="flex items-start gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#27594F] text-[#C97F38]">
+                <Compass className="h-6 w-6" />
+              </span>
+              <div>
+                <h2 className="font-display text-2xl text-[#1c1c10] sm:text-3xl">Não sabe por onde começar?</h2>
+                <p className="mt-1 text-sm text-[#4c524b] sm:text-base">
+                  O diagnóstico gratuito avalia sua empresa nas 6 áreas e mostra qual priorizar, em 2 minutos.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/diagnostico"
+              className="group inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#C97F38] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#C97F38]/30 transition-all hover:-translate-y-0.5 hover:bg-[#b06b29]"
+            >
+              Fazer diagnóstico gratuito
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
         </div>
       </section>
     </div>

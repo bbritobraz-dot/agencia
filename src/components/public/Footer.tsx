@@ -90,6 +90,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/segmentos" className="text-[#E8E7DF]/80 hover:text-white transition-colors">
+                  Segmentos (30 Nichos)
+                </Link>
+              </li>
+              <li>
                 <Link href="/projetos" className="text-[#E8E7DF]/80 hover:text-white transition-colors">
                   Projetos
                 </Link>

@@ -109,6 +109,17 @@ export function Navbar() {
           </div>
 
           <Link
+            href="/segmentos"
+            className={`text-sm font-medium transition-colors ${
+              isActive('/segmentos')
+                ? 'text-[#C97F38] font-semibold'
+                : 'text-[#1c1c10]/85 hover:text-[#27594F]'
+            }`}
+          >
+            Segmentos
+          </Link>
+
+          <Link
             href="/projetos"
             className={`text-sm font-medium transition-colors ${
               isActive('/projetos')
@@ -223,6 +234,13 @@ export function Navbar() {
               )}
             </div>
 
+            <Link
+              href="/segmentos"
+              onClick={() => setMobileOpen(false)}
+              className="rounded-lg px-3 py-2.5 text-base font-medium text-[#1c1c10] hover:bg-[#E8E7DF]"
+            >
+              Segmentos
+            </Link>
             <Link
               href="/projetos"
               onClick={() => setMobileOpen(false)}

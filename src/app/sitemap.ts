@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/seo';
 import { RUNA_SERVICES } from '@/config/services';
 import { RUNA_BLOG_POSTS } from '@/config/blog';
+import { RUNA_SEGMENTS } from '@/config/segments';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = SITE_URL;
@@ -17,6 +18,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/solucoes`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+      images: [`${baseUrl}/og/solucoes.jpg`],
+    },
+    {
+      url: `${baseUrl}/segmentos`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.9,
@@ -73,6 +81,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     images: [`${baseUrl}/og/${service.slug}.jpg`],
   }));
 
+  const segmentRoutes: MetadataRoute.Sitemap = RUNA_SEGMENTS.map((seg) => ({
+    url: seg.canonical,
+    lastModified: now,
+    changeFrequency: 'monthly',
+    priority: 0.85,
+  }));
+
   const blogRoutes: MetadataRoute.Sitemap = RUNA_BLOG_POSTS.filter(
     (post) => post.status === 'published'
   ).map((post) => {
@@ -86,5 +101,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
-  return [...staticRoutes, ...serviceRoutes, ...blogRoutes];
+  return [...staticRoutes, ...serviceRoutes, ...segmentRoutes, ...blogRoutes];
 }
