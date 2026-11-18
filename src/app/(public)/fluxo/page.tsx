@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, Bot, CalendarCheck, Database, MessageCircle, Server, UserRound } from 'lucide-react';
 import { pageMetadata } from '@/lib/seo';
 import { FluxoGuide } from '@/components/public/FluxoGuide';
+import { FLUXO_FAQ } from '@/config/fluxo';
 
 export const metadata: Metadata = pageMetadata({
   title: 'Agente de WhatsApp com IA: o passo a passo',
@@ -36,7 +37,7 @@ export default function FluxoPage() {
             Um agente de WhatsApp que atende seus leads 24 horas.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-[#E8E7DF]/85 sm:text-lg">
-            Ele responde quem chega dos anúncios na hora, qualifica, marca a reunião na sua agenda e registra tudo no CRM. Você entra só para fechar. Este é o passo a passo para montar o seu com o Claude.
+            Ele responde quem chega dos anúncios na hora, qualifica, marca a reunião na sua agenda e registra tudo no CRM. Você entra só para fechar. Abaixo está o passo a passo completo para montar o seu com o Claude, e o atalho para fazer isso com o Claude Code.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#passo-a-passo" className="inline-flex items-center gap-2 rounded-full bg-[#C97F38] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#b56f2c]">
@@ -49,6 +50,9 @@ export default function FluxoPage() {
               className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:border-white"
             >
               Quero que a RUNA monte o meu
+            </a>
+            <a href="#claude-code" className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:border-white">
+              Montar com o Claude Code
             </a>
           </div>
         </div>
@@ -84,12 +88,33 @@ export default function FluxoPage() {
         <FluxoGuide />
       </div>
 
+      {/* Dúvidas */}
+      <section className="border-t border-[#e4e0d6] bg-[#f3f1ea] py-14">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <span className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">— Dúvidas</span>
+          <h2 className="mt-2 font-display text-3xl text-[#1d3b35] sm:text-4xl">Perguntas frequentes</h2>
+          <div className="mt-8 space-y-3">
+            {FLUXO_FAQ.map((f) => (
+              <details key={f.pergunta} className="group rounded-2xl border border-[#e4e0d6] bg-white p-5">
+                <summary className="cursor-pointer list-none font-semibold text-[#1d3b35] marker:hidden">
+                  <span className="flex items-center justify-between gap-4">
+                    {f.pergunta}
+                    <span className="text-[#C97F38] transition group-open:rotate-45">+</span>
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-[#4a5a55]">{f.resposta}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Chamada final */}
       <section className="bg-runa-pattern-dark py-16 text-white">
         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="font-display text-3xl sm:text-4xl">Prefere receber pronto?</h2>
+          <h2 className="font-display text-3xl sm:text-5xl">Quer que a RUNA faça para você?</h2>
           <p className="mt-4 text-[#E8E7DF]/85">
-            A RUNA monta o agente com o seu roteiro, a sua agenda e o seu CRM, e acompanha os primeiros atendimentos com você. Serve para agências, prestadores de serviço e qualquer negócio que precise de atendimento 24 horas.
+            A gente monta o agente com o seu roteiro, conecta o seu WhatsApp, a sua agenda e o seu CRM, testa com você e acompanha os primeiros atendimentos. Serve para agências, clínicas, lojas, prestadores de serviço e qualquer negócio que precise atender 24 horas.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <a
@@ -98,10 +123,10 @@ export default function FluxoPage() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-sm font-semibold text-white transition hover:brightness-95"
             >
-              <MessageCircle className="h-4 w-4" /> Falar com a RUNA
+              <MessageCircle className="h-4 w-4" /> Entrar em contato pelo WhatsApp
             </a>
-            <Link href="/solucoes" className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:border-white">
-              Ver soluções
+            <Link href="/contato" className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:border-white">
+              Preencher o formulário <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

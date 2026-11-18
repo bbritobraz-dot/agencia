@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useSyncExternalStore } from 'react';
 import { AlertTriangle, Check, Copy, ShieldCheck, QrCode } from 'lucide-react';
-import { FLUXO_CAMINHOS, FLUXO_PASSOS, type FluxoCaminho } from '@/config/fluxo';
+import { FLUXO_CAMINHOS, FLUXO_CLAUDE_CODE, FLUXO_PASSOS, type FluxoCaminho } from '@/config/fluxo';
 
 const CHAVE = 'runa-fluxo-v1';
 
@@ -90,6 +90,10 @@ export function FluxoGuide() {
 
   const passos = useMemo(
     () => FLUXO_PASSOS.filter((p) => p.caminhos.includes(estado.caminho)),
+    [estado.caminho]
+  );
+  const prompts = useMemo(
+    () => FLUXO_CLAUDE_CODE.filter((p) => p.caminhos.includes(estado.caminho)),
     [estado.caminho]
   );
   const feitos = passos.filter((p) => estado.feitos.includes(p.id)).length;
@@ -213,6 +217,63 @@ export function FluxoGuide() {
               );
             })}
           </ol>
+        </div>
+      </section>
+
+      {/* Claude Code */}
+      <section id="claude-code" className="scroll-mt-20 border-t border-[#e4e0d6] py-14">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <span className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">— Atalho</span>
+          <h2 className="mt-2 font-display text-3xl text-[#1d3b35] sm:text-4xl">Monte com o Claude Code</h2>
+          <p className="mt-3 max-w-3xl text-[#4a5a55]">
+            O Claude Code é o Claude trabalhando no seu computador: ele cria os arquivos, escreve o código, roda os comandos e corrige os erros junto com você. Em vez de seguir cada passo sozinho, você pede e acompanha. Ele monta e mantém o agente; quem atende 24 horas é o agente rodando no servidor.
+          </p>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-[#e4e0d6] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">1 · Conta</p>
+              <p className="mt-2 text-sm text-[#2b3a36]">
+                Precisa de um plano pago do Claude (Pro, Max, Team ou Enterprise) ou de uma conta no Claude Console com créditos. O plano gratuito não inclui o Claude Code.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-[#e4e0d6] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">2 · Instalação</p>
+              <p className="mt-2 text-sm text-[#2b3a36]">No Mac ou Linux, no Terminal:</p>
+              <code className="mt-2 block break-all rounded-lg bg-[#0f2420] px-3 py-2 text-xs text-[#E8E7DF]">curl -fsSL https://claude.ai/install.sh | bash</code>
+              <p className="mt-2 text-sm text-[#2b3a36]">No Windows, no PowerShell:</p>
+              <code className="mt-2 block break-all rounded-lg bg-[#0f2420] px-3 py-2 text-xs text-[#E8E7DF]">irm https://claude.ai/install.ps1 | iex</code>
+            </div>
+            <div className="rounded-2xl border border-[#e4e0d6] bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#C97F38]">3 · Começar</p>
+              <p className="mt-2 text-sm text-[#2b3a36]">Crie uma pasta para o projeto, entre nela e abra o Claude Code:</p>
+              <code className="mt-2 block rounded-lg bg-[#0f2420] px-3 py-2 text-xs text-[#E8E7DF]">mkdir agente-whatsapp && cd agente-whatsapp && claude</code>
+              <p className="mt-2 text-sm text-[#2b3a36]">Na primeira vez, ele pede para você entrar com a sua conta.</p>
+            </div>
+          </div>
+
+          <p className="mt-10 text-sm font-semibold text-[#1d3b35]">
+            Agora é conversar. Copie os pedidos abaixo, na ordem, trocando o que está entre {'<'} e {'>'} ({FLUXO_CAMINHOS[estado.caminho].nome.toLowerCase()}):
+          </p>
+          <ol className="mt-5 space-y-5">
+            {prompts.map((p, i) => (
+              <li key={p.titulo} className="rounded-2xl border border-[#e4e0d6] bg-white p-6">
+                <div className="flex items-baseline gap-3">
+                  <span className="font-display text-2xl text-[#C97F38]">{String(i + 1).padStart(2, '0')}</span>
+                  <div>
+                    <h3 className="text-lg font-semibold text-[#1d3b35]">{p.titulo}</h3>
+                    <p className="mt-1 text-sm text-[#4a5a55]">{p.explicacao}</p>
+                  </div>
+                </div>
+                <BlocoCodigo rotulo="Pedido para o Claude Code" texto={p.prompt} />
+              </li>
+            ))}
+          </ol>
+          <div className="mt-6 flex gap-3 rounded-xl border border-[#27594F]/30 bg-[#27594F]/5 p-4 text-sm text-[#2b3a36]">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#27594F]" />
+            <p>
+              Leia o que o Claude Code vai fazer antes de aprovar cada comando, e nunca cole senhas ou chaves no chat: guarde-as em variáveis de ambiente, como ele mesmo vai sugerir.
+            </p>
+          </div>
         </div>
       </section>
     </div>
