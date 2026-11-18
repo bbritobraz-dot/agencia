@@ -31,6 +31,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       images: [`${baseUrl}/og/solucoes.jpg`],
     },
     {
+      url: `${baseUrl}/fluxo`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/diagnostico`,
       lastModified: now,
       changeFrequency: 'weekly',
