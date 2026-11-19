@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
     };
 
     if (targetStage === 'fechado' && contractValue && contractValue > 0) {
-      oppUpdates.value = contractValue;
+      oppUpdates.estimated_value = contractValue;
     }
 
     await adminSupabase.from('opportunities').update(oppUpdates).eq('lead_id', leadId);

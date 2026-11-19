@@ -27,6 +27,66 @@ interface ContractModalState {
   contractValue: string;
 }
 
+function DealValueEditor({ value, onSave }: { value: number; onSave: (v: number) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
+
+  const commit = () => {
+    setEditing(false);
+    const cleaned = draft.replace(/[^\d,.]/g, '');
+    const parsed = cleaned
+      ? parseFloat(cleaned.includes(',') ? cleaned.replace(/\./g, '').replace(',', '.') : cleaned)
+      : 0;
+    if (!Number.isFinite(parsed) || parsed < 0 || parsed === value) return;
+    onSave(parsed);
+  };
+
+  if (editing) {
+    return (
+      <div className="mt-2 flex items-center gap-1">
+        <span className="text-xs font-bold text-[#4c524b]">R$</span>
+        <input
+          autoFocus
+          inputMode="decimal"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') commit();
+            if (e.key === 'Escape') setEditing(false);
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+          onDragStart={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          draggable
+          placeholder="0"
+          aria-label="Valor do negócio"
+          className="w-28 rounded-md border border-[#27594F] bg-white px-2 py-0.5 font-mono text-xs font-bold text-[#1c1c10] focus:outline-none"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        setDraft(value > 0 ? String(value).replace('.', ',') : '');
+        setEditing(true);
+      }}
+      title="Clique para editar o valor"
+      className={`mt-2 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-mono text-xs font-bold hover:bg-[#E8E7DF] ${
+        value > 0 ? 'text-[#16A34A]' : 'text-[#8a897c]'
+      }`}
+    >
+      <DollarSign className="h-3 w-3" />
+      {value > 0 ? formatBRL(value) : 'Adicionar valor'}
+    </button>
+  );
+}
+
 const formatBRL = (value: number) =>
   value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
 
@@ -131,6 +191,23 @@ export function KanbanPipelineClient({
       );
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const saveDealValue = async (leadId: string, value: number) => {
+    const previous = leadValues[leadId] || 0;
+    setLeadValues((prev) => ({ ...prev, [leadId]: value }));
+    try {
+      const response = await fetch('/api/admin/leads/deal-value', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leadId, value }),
+      });
+      const resJson = await response.json();
+      if (!response.ok || !resJson.success) throw new Error(resJson.error);
+    } catch (err) {
+      setLeadValues((prev) => ({ ...prev, [leadId]: previous }));
+      alert((err instanceof Error && err.message) || 'Erro ao salvar o valor.');
     }
   };
 
@@ -290,11 +367,10 @@ export function KanbanPipelineClient({
                       </span>
                     </div>
 
-                    {leadValues[lead.id] > 0 && (
-                      <div className="mt-2 font-mono text-xs font-bold text-[#16A34A]">
-                        {formatBRL(leadValues[lead.id])}
-                      </div>
-                    )}
+                    <DealValueEditor
+                      value={leadValues[lead.id] || 0}
+                      onSave={(v) => saveDealValue(lead.id, v)}
+                    />
 
                     {lead.recommended_service && (
                       <div className="mt-2 rounded-lg bg-[#E8E7DF]/60 px-2.5 py-1.5 text-[11px] font-semibold text-[#27594F] truncate">
