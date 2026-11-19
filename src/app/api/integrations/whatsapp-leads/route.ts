@@ -42,6 +42,8 @@ interface SyncBody {
   stage?: PipelineStageSlug;
   notes?: string;
   monthly_value?: number;
+  /** Valor total do negócio (projeto fechado), em reais. */
+  deal_value?: number;
   activities?: SyncActivity[];
   tasks?: SyncTask[];
 }
@@ -130,6 +132,7 @@ export async function POST(request: NextRequest) {
         service_slug: service.slug,
         service_name: service.name,
         monthly_recurring_value: body.monthly_value ?? null,
+        estimated_value: body.deal_value ?? null,
         probability: 30,
         status: 'open',
       });
@@ -154,6 +157,17 @@ export async function POST(request: NextRequest) {
       if (body.website) update.website = clip(body.website, 200);
       if (notes) update.internal_notes = notes;
       if (stage && stage !== existing.stage_slug) update.stage_slug = stage;
+
+      // Valor do negócio pode mudar sem mudança de etapa
+      if (body.deal_value != null || body.monthly_value != null) {
+        await supabase
+          .from('opportunities')
+          .update({
+            ...(body.deal_value != null ? { estimated_value: body.deal_value } : {}),
+            ...(body.monthly_value != null ? { monthly_recurring_value: body.monthly_value } : {}),
+          })
+          .eq('lead_id', leadId);
+      }
 
       const { error } = await supabase.from('leads').update(update).eq('id', leadId);
       if (error) throw new Error(error.message);
