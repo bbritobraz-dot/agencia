@@ -27,14 +27,28 @@ interface ContractModalState {
   contractValue: string;
 }
 
+const formatBRL = (value: number) =>
+  value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+
 export function KanbanPipelineClient({
   initialLeads,
+  leadValues: initialLeadValues = {},
   adminName,
 }: {
   initialLeads: LeadRecord[];
+  leadValues?: Record<string, number>;
   adminName: string;
 }) {
   const [leads, setLeads] = useState<LeadRecord[]>(initialLeads);
+  const [leadValues, setLeadValues] = useState<Record<string, number>>(initialLeadValues);
+  const stageTotal = (slug: PipelineStageSlug) =>
+    leads
+      .filter((l) => l.stage_slug === slug)
+      .reduce((sum, l) => sum + (leadValues[l.id] || 0), 0);
+  const openTotal = leads
+    .filter((l) => l.stage_slug !== 'fechado' && l.stage_slug !== 'perdido')
+    .reduce((sum, l) => sum + (leadValues[l.id] || 0), 0);
+  const wonTotal = stageTotal('fechado');
   const [draggedLeadId, setDraggedLeadId] = useState<string | null>(null);
   const [dragOverStage, setDragOverStage] = useState<PipelineStageSlug | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -150,6 +164,9 @@ export function KanbanPipelineClient({
     const contractId = contractModal.contractId.trim();
 
     setContractModal({ isOpen: false, lead: null, contractId: '', contractValue: '' });
+    if (parsedValue && parsedValue > 0) {
+      setLeadValues((prev) => ({ ...prev, [leadId]: parsedValue }));
+    }
     await executeStageTransition(leadId, 'fechado', {
       contractId: contractId || undefined,
       contractValue: parsedValue && parsedValue > 0 ? parsedValue : undefined,
@@ -170,6 +187,16 @@ export function KanbanPipelineClient({
             Arraste os cards entre as colunas. Transições para <strong>Qualificado</strong>,{' '}
             <strong>Proposta enviada</strong> e <strong>Fechado</strong> disparam eventos automáticos via Meta Conversions API com os dados do lead original.
           </p>
+        </div>
+        <div className="flex gap-3 shrink-0">
+          <div className="rounded-xl border border-[#d8d7cf] bg-white px-4 py-2.5">
+            <span className="block text-[10px] font-bold uppercase tracking-wider text-[#4c524b]">Em aberto no funil</span>
+            <span className="font-mono text-lg font-bold text-[#1e4840]">{formatBRL(openTotal)}</span>
+          </div>
+          <div className="rounded-xl border border-[#d8d7cf] bg-white px-4 py-2.5">
+            <span className="block text-[10px] font-bold uppercase tracking-wider text-[#4c524b]">Fechado</span>
+            <span className="font-mono text-lg font-bold text-[#16A34A]">{formatBRL(wonTotal)}</span>
+          </div>
         </div>
       </div>
 
@@ -217,6 +244,12 @@ export function KanbanPipelineClient({
                   {columnLeads.length}
                 </span>
               </div>
+              <div className="mb-3 -mt-1 flex items-center justify-between rounded-lg bg-white px-2.5 py-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#4c524b]">Valor na etapa</span>
+                <span className="font-mono text-sm font-bold" style={{ color: stageTotal(stage.slug) > 0 ? '#1e4840' : '#8a897c' }}>
+                  {formatBRL(stageTotal(stage.slug))}
+                </span>
+              </div>
 
               {/* Cards da Coluna */}
               <div className="flex-1 space-y-3 min-h-[420px]">
@@ -256,6 +289,12 @@ export function KanbanPipelineClient({
                         {lead.segment || lead.source}
                       </span>
                     </div>
+
+                    {leadValues[lead.id] > 0 && (
+                      <div className="mt-2 font-mono text-xs font-bold text-[#16A34A]">
+                        {formatBRL(leadValues[lead.id])}
+                      </div>
+                    )}
 
                     {lead.recommended_service && (
                       <div className="mt-2 rounded-lg bg-[#E8E7DF]/60 px-2.5 py-1.5 text-[11px] font-semibold text-[#27594F] truncate">

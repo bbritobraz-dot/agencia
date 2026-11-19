@@ -11,7 +11,7 @@ export default async function AdminPipelinePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [{ data: leadsData }, { data: adminProfile }] = await Promise.all([
+  const [{ data: leadsData }, { data: adminProfile }, { data: oppsData }] = await Promise.all([
     supabase
       .from('leads')
       .select('*')
@@ -21,11 +21,24 @@ export default async function AdminPipelinePage() {
       .select('full_name')
       .eq('id', user?.id || '')
       .maybeSingle(),
+    supabase
+      .from('opportunities')
+      .select('lead_id, estimated_value, status, updated_at')
+      .order('updated_at', { ascending: false }),
   ]);
+
+  // Valor do negócio por lead: oportunidade mais recente que não foi perdida
+  const leadValues: Record<string, number> = {};
+  for (const opp of oppsData || []) {
+    if (opp.status === 'lost' || opp.lead_id in leadValues) continue;
+    const value = Number(opp.estimated_value);
+    if (value > 0) leadValues[opp.lead_id] = value;
+  }
 
   return (
     <KanbanPipelineClient
       initialLeads={(leadsData || []) as LeadRecord[]}
+      leadValues={leadValues}
       adminName={adminProfile?.full_name || 'Administrador RUNA'}
     />
   );
